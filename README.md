@@ -10,6 +10,7 @@ This will allow Cirkl to complete its purpose of photo sharing.
 - Two users have their own cirkl devices which are connected to the internet.
 - User A visits the web app and uploads a photo from their phone/computer. 
 - User B's Cirkl pings, showing a notification that it received a new message. User B can now view the image sent to their device.
+- The same process can happen in reverse with user B sending a message to user A's Cirkl.
 
 This allows for personalized photos and messages to be sent to a Cirkl owner.
 
