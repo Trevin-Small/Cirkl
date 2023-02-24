@@ -2,14 +2,15 @@
 #include "../ui_lib.h"
 #include "apps.h"
 
-#define X_BTN_WIDTH                    70
-#define X_BTN_HEIGHT                  130
+#define X_BTN_BG_WIDTH                 85
+#define X_BTN_BG_HEIGHT               160
+#define X_BTN_SIZE                     50
 #define X_BTN_X                       350
-#define X_BTN_Y_HIDE                 -100
-#define X_BTN_Y_SHOW                    0
-#define X_BTN_ANIM_DURATION           300
-#define X_BTN_ANIM_DELAY             1000
-#define X_BTN_ANIM_START_DELAY        300
+#define X_BTN_Y_HIDE                 -130
+#define X_BTN_Y_SHOW                   10
+#define X_BTN_ANIM_DURATION           250
+#define X_BTN_ANIM_DELAY             1750
+#define X_BTN_ANIM_START_DELAY        250
 
 void anim_x_btn(lv_event_t * e) {
 
@@ -31,20 +32,20 @@ void anim_x_btn(lv_event_t * e) {
 }
 
 void app_tile_init() {
-  lv_obj_t * x_btn_bg = new_ui_flex_container(System.app_screen_tile, LV_ALIGN_DEFAULT, LV_FLEX_FLOW_COLUMN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, X_BTN_WIDTH, X_BTN_HEIGHT, X_BTN_X, X_BTN_Y_HIDE);
+  lv_obj_t * x_btn_bg = new_ui_flex_container(System.app_screen_tile, LV_ALIGN_DEFAULT, LV_FLEX_FLOW_COLUMN, LV_FLEX_ALIGN_END, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, X_BTN_BG_WIDTH, X_BTN_BG_HEIGHT, X_BTN_X, X_BTN_Y_HIDE);
 
   lv_obj_set_style_bg_color(x_btn_bg, lv_color_hex(0x535353), LV_STATE_DEFAULT);
   lv_obj_set_style_bg_opa(x_btn_bg, LV_OPA_COVER, LV_STATE_DEFAULT);
   lv_obj_set_style_radius(x_btn_bg, 15, LV_STATE_DEFAULT);
   lv_obj_set_style_pad_all(x_btn_bg, 15, LV_STATE_DEFAULT);
 
-  lv_obj_t * x_btn = new_ui_flex_container(x_btn_bg, LV_ALIGN_DEFAULT, LV_FLEX_FLOW_ROW, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, 40, 40, 0, 0);
+  lv_obj_t * x_btn = new_ui_flex_container(x_btn_bg, LV_ALIGN_DEFAULT, LV_FLEX_FLOW_ROW, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, X_BTN_SIZE, X_BTN_SIZE, 0, 0);
 
   lv_obj_set_style_bg_color(x_btn, lv_color_hex(0xff0000), LV_STATE_DEFAULT);
   lv_obj_set_style_bg_opa(x_btn, LV_OPA_COVER, LV_STATE_DEFAULT);
   lv_obj_set_style_radius(x_btn, 10, LV_STATE_DEFAULT);
 
-  lv_obj_t * x_btn_label = new_ui_label(x_btn, &sf_bold_18, "#ffffff x#", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
+  lv_obj_t * x_btn_label = new_ui_label(x_btn, &sf_bold_22, "#ffffff x#", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
 
   // Add a callback to close the app when the "x" button is clicked
   lv_obj_add_event_cb(x_btn, close_app_event_cb, LV_EVENT_CLICKED, NULL);

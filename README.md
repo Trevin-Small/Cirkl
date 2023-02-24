@@ -9,7 +9,7 @@ letter in a 21st-century form factor by giving its users a physical way to view 
 
 ![Cirkl Device](https://github.com/Trevin-Small/Cirkl/blob/main/cirkl_device/images/cirkl_device.jpg)
 
-Currently the firmware of the device is being developed. In the future, however, a web app with a Google Firebase 
+Currently the firmware of the device is being developed. In the future, however, a web app with a Google Firebase
 backend will be built which Cirkl can communicate with. This will allow Cirkl to complete its purpose of photo sharing.
 
 # For Example:
