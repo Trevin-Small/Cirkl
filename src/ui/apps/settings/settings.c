@@ -9,5 +9,7 @@ lv_obj_t * settings_init(lv_obj_t * parent) {
 
   lv_obj_set_style_text_color(settings_label, System.font_accent_color, LV_STATE_DEFAULT);
 
+  
+
   return settings_content;
 }
