@@ -22,7 +22,7 @@ backend will be built which Cirkl can communicate with. This will allow Cirkl to
 - Internet time and weather
 - Support sharing photos, text, and drawings
 - "Gallery" mode - flip through x amount of most recent messages
-- Sync on-device reminders with Google Calendar
+- Fetch and display your reminders from Google Calendar
 - Settings app to modify device color scheme and other configurations
 - SD Card support (offline message storage, device settings, etc)
 - App extensibility (for future feature additions)
