@@ -1,5 +1,4 @@
 #include "ui.h"
-#include "ui_helpers.h"
 
 lv_obj_t * new_ui_screen(lv_color_t bg_color, lv_obj_flag_t f) {
   lv_obj_t * screen = lv_obj_create(NULL);

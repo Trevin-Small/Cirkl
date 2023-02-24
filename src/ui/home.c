@@ -1,5 +1,5 @@
-#include "../ui.h"
-#include "../ui_lib.h"
+#include "ui.h"
+#include "ui_lib.h"
 #include "apps.h"
 
 void device_sleep_cb() {

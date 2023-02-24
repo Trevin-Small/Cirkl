@@ -1,4 +1,4 @@
-#include "../ui.h"
+#include "ui.h"
 
 #define COLOR_PALETTE 0
 

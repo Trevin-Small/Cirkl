@@ -1,5 +1,5 @@
-#include "../ui.h"
-#include "../ui_lib.h"
+#include "ui.h"
+#include "ui_lib.h"
 #include "apps.h"
 
 #define X_BTN_BG_WIDTH                 80
@@ -19,6 +19,10 @@ struct x_out_btn {
 } x_out_btn;
 
 void anim_x_btn(lv_event_t * e) {
+
+  if (lv_obj_get_y(x_out_btn.bg) != X_BTN_Y_HIDE) {
+    return;
+  }
 
   lv_anim_init(&x_out_btn.anim);
   lv_anim_set_var(&x_out_btn.anim, x_out_btn.bg);

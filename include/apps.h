@@ -1,6 +1,6 @@
 #pragma once
 
-#include "../ui.h"
+#include "ui.h"
 
 //------------------------ SYSTEM FUNCTIONS ---------------------------//
 lv_obj_t * home_screen();

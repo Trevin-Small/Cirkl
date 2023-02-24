@@ -9,8 +9,7 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 #include "./hardware_drivers/XL9535_driver.h"
-#include "./ui/ui.h"
-#include "./ui/images/img.h"
+#include "ui.h"
 #include "pin_config.h"
 
 #include <Arduino.h>

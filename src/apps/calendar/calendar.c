@@ -1,6 +1,6 @@
-#include "../../ui.h"
-#include "../../ui_lib.h"
-#include "../apps.h"
+#include "ui.h"
+#include "ui_lib.h"
+#include "apps.h"
 
 lv_obj_t * calendar_init(lv_obj_t * parent) {
   lv_obj_t * gallery_content = new_ui_flex_container(parent, LV_ALIGN_CENTER, LV_FLEX_FLOW_COLUMN, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_SIZE_CONTENT, LV_SIZE_CONTENT, 0, 0);

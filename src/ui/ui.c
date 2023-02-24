@@ -1,6 +1,5 @@
 #include "ui.h"
-#include "ui_helpers.h"
-#include "./apps/apps.h"
+#include "apps.h"
 #include "palettes/palettes.h"
 
 ///////////////////// VARIABLES ////////////////////
