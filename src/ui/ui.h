@@ -49,6 +49,7 @@ typedef struct system {
     lv_obj_t * info_tile;
     lv_obj_t * app_list_tile;
     lv_obj_t * app_screen_tile;
+    lv_obj_t * app_content;
     lv_coord_t app_tile_coord_x;
     lv_coord_t app_tile_coord_y;
     bool app_is_open;

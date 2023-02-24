@@ -142,7 +142,6 @@ lv_obj_t * create_app_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, lv_dir
   return ui_app_tile;
 }
 
-
 lv_obj_t * home_screen(void) {
   lv_obj_t* ui_screen_home = lv_obj_create(NULL);
   lv_obj_clear_flag( ui_screen_home, LV_OBJ_FLAG_SCROLLABLE );
@@ -156,6 +155,8 @@ lv_obj_t * home_screen(void) {
   System.info_tile = create_info_tile(System.main_tile_view, 0, 0, LV_DIR_RIGHT);
   System.app_list_tile = create_app_list_tile(System.main_tile_view, 1, 0, LV_DIR_LEFT | can_swipe_right);
   System.app_screen_tile = create_app_tile(System.main_tile_view, 2, 0, LV_DIR_NONE);
+
+  app_tile_init();
 
   return ui_screen_home;
 }
