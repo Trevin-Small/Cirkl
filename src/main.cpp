@@ -32,7 +32,6 @@ typedef struct {
 } lcd_init_cmd_t;
 
 esp_lcd_panel_handle_t panel_handle = NULL;
-bool is_asleep = false;
 
 DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0xFF, {0x77, 0x01, 0x00, 0x00, 0x10}, 0x05},
@@ -249,7 +248,8 @@ void setup() {
   attachInterrupt(
       TP_INT_PIN, [] { touch_pin_get_int = true; }, FALLING);
 
-  //ui_begin();
+
+  System.is_asleep = false;
   ui_init();
   xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
 }
@@ -259,7 +259,7 @@ void loop() {
   static uint32_t Millis;
   delay(2);
 
-  if (!is_asleep) {
+  if (!System.is_asleep) {
     lv_timer_handler();
   }
 
@@ -493,5 +493,5 @@ void deep_sleep(void) {
   esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
   esp_deep_sleep_start();
 
-  is_asleep = false;
+  System.is_asleep = false;
 }

@@ -13,6 +13,7 @@
 #define SCREEN_SIZE       480
 #define WEATHER_ICON_SIZE  64
 #define APP_ICON_SIZE      96
+#define APP_GRID_SIZE     128
 
 #include "stdint.h"
 
@@ -37,10 +38,25 @@ extern "C" {
   #include "lvgl.h"
 #endif
 
-extern lv_color_t system_theme;
-extern lv_color_t system_font_main;
-extern lv_color_t system_font_accent;
-extern bool is_asleep;
+typedef struct system {
+
+    lv_color_t theme_main_color;
+    lv_color_t theme_accent_color;
+    lv_color_t font_main_color;
+    lv_color_t font_accent_color;
+    lv_obj_t * active_screen;
+    lv_obj_t * main_tile_view;
+    lv_obj_t * info_tile;
+    lv_obj_t * app_list_tile;
+    lv_obj_t * app_screen_tile;
+    lv_coord_t app_tile_coord_x;
+    lv_coord_t app_tile_coord_y;
+    bool app_is_open;
+    bool is_asleep;
+
+} system_t;
+
+extern system_t System;
 
 LV_IMG_DECLARE( ui_img_mail_png);   // assets/mail.png
 LV_IMG_DECLARE( ui_img_gallery_png);   // assets/gallery.png
@@ -54,7 +70,6 @@ LV_IMG_DECLARE( ui_img_weather_snow_png);   // assets/shutdown.png
 LV_IMG_DECLARE( ui_img_weather_wind_png);   // assets/shutdown.png
 
 void deep_sleep(void);
-void device_sleep();
 void ui_init(void);
 
 #ifdef __cplusplus
