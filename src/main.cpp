@@ -11,6 +11,7 @@
 #include "./hardware_drivers/XL9535_driver.h"
 #include "ui.h"
 #include "pin_config.h"
+#include "secrets.h"
 
 #include <Arduino.h>
 
@@ -474,6 +475,9 @@ void wifi_task(void *param) {
 }
 
 void deep_sleep(void) {
+
+  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
+
   //WiFi.disconnect();
   detachInterrupt(TP_INT_PIN);
   xl.pinMode8(0, 0xff, INPUT);
@@ -485,8 +489,6 @@ void deep_sleep(void) {
   if (SD_MMC.cardSize())
     SD_MMC.end();
   */
-
-  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
   delay(500);
 
   esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);

@@ -3,6 +3,7 @@
 #include "apps.h"
 
 void device_sleep_cb() {
+
     System.is_asleep = true;
     deep_sleep();
 }
@@ -50,7 +51,7 @@ lv_obj_t * create_info_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, lv_di
   lv_obj_set_style_radius(ui_reminder_bubble, LV_RADIUS_CIRCLE, LV_STATE_DEFAULT);
   lv_obj_align(ui_reminder_bubble, LV_ALIGN_CENTER, 0, 0);
 
-  ui_reminder_label = new_ui_label(ui_reminder_row, &sf_bold_14, "2 New Reminders", LV_ALIGN_OUT_BOTTOM_MID, LV_SIZE_CONTENT,
+  ui_reminder_label = new_ui_label(ui_reminder_row, &sf_bold_16, "2 New Reminders", LV_ALIGN_OUT_BOTTOM_MID, LV_SIZE_CONTENT,
     0, 0);
 
   lv_obj_set_style_text_color(ui_clock_label, System.font_accent_color, LV_STATE_DEFAULT);
@@ -97,25 +98,25 @@ lv_obj_t * create_app_list_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, l
 
 
   ui_gallery_btn = new_ui_img_btn(ui_grid, &ui_img_gallery_png, LV_ALIGN_CENTER, APP_ICON_SIZE, APP_ICON_SIZE, 0, 0);
-  ui_gallery_label = new_ui_label(ui_gallery_btn, &sf_bold_14, "Gallery", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
+  ui_gallery_label = new_ui_label(ui_gallery_btn, &sf_bold_16, "Gallery", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
   lv_obj_align_to(ui_gallery_label, ui_gallery_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
   lv_obj_add_event_cb(ui_gallery_btn, open_app_event_cb, LV_EVENT_CLICKED, &gallery_init);
 
 
   ui_calendar_btn = new_ui_img_btn(ui_grid, &ui_img_calendar_png, LV_ALIGN_CENTER, APP_ICON_SIZE, APP_ICON_SIZE, 0, 0);
-  ui_calendar_label = new_ui_label(ui_calendar_btn, &sf_bold_14, "Calendar", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
+  ui_calendar_label = new_ui_label(ui_calendar_btn, &sf_bold_16, "Calendar", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
   lv_obj_align_to(ui_calendar_label, ui_calendar_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
   lv_obj_add_event_cb(ui_calendar_btn, open_app_event_cb, LV_EVENT_CLICKED, &calendar_init);
 
 
   ui_settings_btn = new_ui_img_btn(ui_grid, &ui_img_settings_png, LV_ALIGN_CENTER, APP_ICON_SIZE, APP_ICON_SIZE, 0, 0);
-  ui_settings_label = new_ui_label(ui_settings_btn, &sf_bold_14, "Settings", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
+  ui_settings_label = new_ui_label(ui_settings_btn, &sf_bold_16, "Settings", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
   lv_obj_align_to(ui_settings_label, ui_settings_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
   lv_obj_add_event_cb(ui_settings_btn, open_app_event_cb, LV_EVENT_CLICKED, &settings_init);
 
 
   ui_shutdown_btn = new_ui_img_btn(ui_grid, &ui_img_shutdown_png, LV_ALIGN_CENTER, APP_ICON_SIZE, APP_ICON_SIZE, 0, 0);
-  ui_shutdown_label = new_ui_label(ui_shutdown_btn, &sf_bold_14, "Shutdown", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
+  ui_shutdown_label = new_ui_label(ui_shutdown_btn, &sf_bold_16, "Shutdown", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
   lv_obj_align_to(ui_shutdown_label, ui_shutdown_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
   lv_obj_add_event_cb(ui_shutdown_btn, device_sleep_cb, LV_EVENT_CLICKED, NULL);
 
@@ -145,9 +146,10 @@ lv_obj_t * create_app_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, lv_dir
 lv_obj_t * home_screen(void) {
   lv_obj_t* ui_screen_home = lv_obj_create(NULL);
   lv_obj_clear_flag( ui_screen_home, LV_OBJ_FLAG_SCROLLABLE );
+  lv_obj_set_style_bg_color(ui_screen_home, System.theme_main_color, LV_STATE_DEFAULT);
 
   System.main_tile_view = lv_tileview_create(ui_screen_home);
-  lv_obj_set_style_bg_color(System.main_tile_view, System.theme_main_color, LV_STATE_DEFAULT);
+  lv_obj_set_style_bg_opa(System.main_tile_view, 0, LV_STATE_DEFAULT);
   lv_obj_set_size(System.main_tile_view, SCREEN_SIZE, SCREEN_SIZE);
 
   int can_swipe_right = System.app_is_open == true ? LV_DIR_RIGHT : LV_DIR_LEFT;

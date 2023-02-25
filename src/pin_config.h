@@ -1,8 +1,5 @@
 #pragma once
 
-#define WIFI_SSID                      "PALGaming"
-#define WIFI_PASSWORD                  ""
-
 #define EXAMPLE_LCD_PIXEL_CLOCK_HZ     (8 * 1000 * 1000)
 #define EXAMPLE_LCD_BK_LIGHT_ON_LEVEL  1
 #define EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL !EXAMPLE_LCD_BK_LIGHT_ON_LEVEL
