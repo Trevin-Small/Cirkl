@@ -14,6 +14,8 @@
 #include "secrets.h"
 
 #include <Arduino.h>
+#include <WifiLocation.h>
+#include "time.h"
 
 #define TOUCH_MODULE_CST820
 // #define TOUCH_MODULE_FT3267
@@ -143,7 +145,6 @@ void setup() {
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, 175);
   SD_init();
-
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(100);
   xl.digitalWrite(TP_RES_PIN, 1);
@@ -365,6 +366,27 @@ void SD_init(void) {
 }
 // This task is used to test WIFI, http test
 void wifi_task(void *param) {
+
+  const char* ntpServer = "pool.ntp.org";
+  const long  gmtOffset_sec = -18000;
+  const int   daylightOffset_sec = 3600;
+
+  //WifiLocation location (GOOGLE_API_KEY);
+  //location_t loc = location.getGeoFromWiFi();
+  /*
+    Serial.println("Location request data");
+    Serial.println(location.getSurroundingWiFiJson()+"\n");
+    Serial.println ("Location: " + String (loc.lat, 7) + "," + String (loc.lon, 7));
+    //Serial.println("Longitude: " + String(loc.lon, 7));
+    Serial.println ("Accuracy: " + String (loc.accuracy));
+    Serial.println ("Result: " + location.wlStatusStr (location.getStatus ()));
+  */
+
+  // Init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
+  struct tm timeinfo;
+
   String str;
   HTTPClient http_client;
   WiFi.disconnect();
@@ -440,12 +462,31 @@ void wifi_task(void *param) {
   str += "milliseconds\r\n";
   lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
+  //Serial.println("IP: " + WiFi.localIP());
+
   delay(2000);
   String rsp;
   bool is_get_http = false;
+
+  static u_int32_t TimeMillis = millis();
+
   do {
-    http_client.begin("https://www.arduino.cc/");
-    str = "getting https://www.arduino.cc/";
+
+    if (millis() - TimeMillis > 1000) {
+      if(!getLocalTime(&timeinfo)){
+        Serial.println("Failed to obtain time");
+      } else {
+        Serial.println(&timeinfo, "%H:%M");
+        Serial.println(&timeinfo, "%A, %3B %d");
+      }
+
+      TimeMillis = millis();
+    }
+
+
+    /*
+    http_client.begin("https://trevinsmall.com");
+    str = "getting json data";
     lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
     int http_code = http_client.GET();
@@ -467,8 +508,11 @@ void wifi_task(void *param) {
       str = "HTTP GET failed. Try again";
       lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
     }
-    delay(3000);
+    */
+
+    delay(100);
   } while (!is_get_http);
+
   WiFi.disconnect();
   http_client.end();
 
