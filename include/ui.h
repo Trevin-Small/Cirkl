@@ -7,9 +7,11 @@
 #ifndef _SQUARELINE_PROJECT_UI_H
 #define _SQUARELINE_PROJECT_UI_H
 
-#define MSG_BAT_VOLT_UPDATE 1
-#define MSG_TOUCH_UPDATE    2
-#define MSG_WIFI_UPDATE     3
+#define MSG_TIME_UPDATE     1
+#define MSG_DATE_UPDATE     2
+#define MSG_WEATHER_UPDATE  3
+#define MSG_TOUCH_UPDATE   10
+
 #define SCREEN_SIZE       480
 #define WEATHER_ICON_SIZE  64
 #define APP_ICON_SIZE      96

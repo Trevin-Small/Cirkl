@@ -144,7 +144,10 @@ void setup() {
   xl.digitalWrite(PWR_EN_PIN, 1);
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, 175);
+
   SD_init();
+  xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
+
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(100);
   xl.digitalWrite(TP_RES_PIN, 1);
@@ -252,7 +255,6 @@ void setup() {
 
   System.is_asleep = false;
   ui_init();
-  xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
 }
 
 void loop() {
@@ -265,10 +267,7 @@ void loop() {
   }
 
   if (millis() - Millis > 500) {
-    //float v = (analogRead(BAT_VOLT_PIN) * 2 * 3.3) / 4096;
-    //lv_msg_send(MSG_BAT_VOLT_UPDATE, &v);
     Millis = millis();
-    //MAC_ADDRESS = const_cast<char*> (WiFi.macAddress().c_str());
   }
 
 }
@@ -381,103 +380,44 @@ void wifi_task(void *param) {
     Serial.println ("Accuracy: " + String (loc.accuracy));
     Serial.println ("Result: " + location.wlStatusStr (location.getStatus ()));
   */
+  struct tm timeinfo;
 
   // Init and get the time
   configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
 
-  struct tm timeinfo;
-
   String str;
   HTTPClient http_client;
   WiFi.disconnect();
-  WiFi.mode(WIFI_STA);
+
   delay(100);
-
-  Serial.println("MAC Address: " + WiFi.macAddress());
-
-  Serial.println("scan start");
-
-  str = "wifi scan start";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  delay(1000);
-  // WiFi.scanNetworks will return the number of networks found
-  int n = WiFi.scanNetworks();
-  Serial.println("scan done");
-  str = "scan done\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  if (n == 0) {
-    Serial.println("no networks found");
-    str = "no networks found";
-    lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  } else {
-    Serial.print(n);
-    Serial.println(" networks found");
-    str += n;
-    str += " networks found\r\n";
-    for (int i = 0; i < n; ++i) {
-      // Print SSID and RSSI for each network found
-      Serial.print(i + 1);
-      Serial.print(": ");
-      Serial.print(WiFi.SSID(i));
-      Serial.print(" (");
-      Serial.print(WiFi.RSSI(i));
-      Serial.print(")");
-      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
-
-      str += i + 1;
-      str += ": ";
-      str += WiFi.SSID(i);
-      str += " (";
-      str += WiFi.RSSI(i);
-      str += ")";
-      str += (WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*";
-      str += "\r\n";
-    }
-  }
-  str += "\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-  Serial.println("");
-  WiFi.disconnect();
-
-  delay(3000);
-  uint32_t last_m = millis();
-  str = "connecting to wifi\r\n";
-  str += "SSID : " WIFI_SSID "\r\n";
-  str += "PASSWORD : " WIFI_PASSWORD "\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     vTaskDelay(100);
-    str += ".";
-    lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
+
   }
   Serial.printf("\r\n-- wifi connect success! --\r\n");
-  Serial.printf("It takes %d milliseconds\r\n", millis() - last_m);
 
-  str += "\r\n-- wifi connect success! --\r\n";
-  str += "It takes ";
-  str += millis() - last_m;
-  str += "milliseconds\r\n";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-  //Serial.println("IP: " + WiFi.localIP());
-
-  delay(2000);
+  delay(100);
   String rsp;
   bool is_get_http = false;
 
   static u_int32_t TimeMillis = millis();
+  char time_buf[6];
+  char date_buf[24];
 
   do {
 
-    if (millis() - TimeMillis > 1000) {
+    if (millis() - TimeMillis > 5000) {
       if(!getLocalTime(&timeinfo)){
         Serial.println("Failed to obtain time");
       } else {
-        Serial.println(&timeinfo, "%H:%M");
-        Serial.println(&timeinfo, "%A, %3B %d");
+        sprintf(time_buf, "%d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+        lv_msg_send(MSG_TIME_UPDATE, time_buf);
+
+        strftime(date_buf, sizeof(date_buf), "%A, %b %d", &timeinfo);
+        lv_msg_send(MSG_DATE_UPDATE, date_buf);
       }
 
       TimeMillis = millis();
@@ -517,7 +457,7 @@ void wifi_task(void *param) {
   http_client.end();
 
   str = "#00ff00 WIFI detection function completed #";
-  lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
+  //lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
   vTaskDelete(NULL);
 }
@@ -539,8 +479,8 @@ void deep_sleep(void) {
   */
   delay(500);
 
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
-  esp_deep_sleep_start();
+  //esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+  //esp_deep_sleep_start();
 
   System.is_asleep = false;
 }
