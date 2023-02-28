@@ -7,10 +7,10 @@
 #ifndef _SQUARELINE_PROJECT_UI_H
 #define _SQUARELINE_PROJECT_UI_H
 
-#define MSG_TIME_UPDATE     1
-#define MSG_DATE_UPDATE     2
-#define MSG_WEATHER_UPDATE  3
-#define MSG_TOUCH_UPDATE   10
+#define MSG_TIME_UPDATE          1
+#define MSG_DATE_UPDATE          2
+#define MSG_TEMPERATURE_UPDATE   3
+#define MSG_WEATHER_ICON_UPDATE  4
 
 #define SCREEN_SIZE       480
 #define WEATHER_ICON_SIZE  64
@@ -61,16 +61,17 @@ typedef struct system {
 
 extern system_t System;
 
-LV_IMG_DECLARE( ui_img_mail_png);   // assets/mail.png
-LV_IMG_DECLARE( ui_img_gallery_png);   // assets/gallery.png
-LV_IMG_DECLARE( ui_img_settings_png);   // assets/settings.png
-LV_IMG_DECLARE( ui_img_calendar_png);   // assets/calendar.png
-LV_IMG_DECLARE( ui_img_shutdown_png);   // assets/shutdown.png
-LV_IMG_DECLARE( ui_img_weather_sun_png);   // assets/shutdown.png
-LV_IMG_DECLARE( ui_img_weather_cloud_png);   // assets/shutdown.png
-LV_IMG_DECLARE( ui_img_weather_rain_png);   // assets/shutdown.png
-LV_IMG_DECLARE( ui_img_weather_snow_png);   // assets/shutdown.png
-LV_IMG_DECLARE( ui_img_weather_wind_png);   // assets/shutdown.png
+LV_IMG_DECLARE( ui_img_mail_png);
+LV_IMG_DECLARE( ui_img_gallery_png);
+LV_IMG_DECLARE( ui_img_settings_png);
+LV_IMG_DECLARE( ui_img_calendar_png);
+LV_IMG_DECLARE( ui_img_shutdown_png);
+LV_IMG_DECLARE( ui_img_weather_sun_png);
+LV_IMG_DECLARE( ui_img_weather_cloud_png);
+LV_IMG_DECLARE( ui_img_weather_rain_png);
+LV_IMG_DECLARE( ui_img_weather_snow_png);
+LV_IMG_DECLARE( ui_img_weather_wind_png);
+LV_IMG_DECLARE( ui_img_weather_fog_png);
 
 void deep_sleep(void);
 void ui_init(void);

@@ -1,10 +1,43 @@
 {
-
-  "message": "Hello, World!",
-  "data": {
-    "time": "1:30",
-    "date": "Thursday, Feb 28",
-    "temp": "40F"
-  }
-
+  "coord":{
+     "lon":-86.9157,
+     "lat":40.4548
+  },
+  "weather":[
+     {
+        "id":804,
+        "main":"Clouds",
+        "description":"overcast clouds",
+        "icon":"04d"
+     }
+  ],
+  "base":"stations",
+  "main":{
+     "temp":44.17,
+     "feels_like":40.87,
+     "temp_min":42.37,
+     "temp_max":47.05,
+     "pressure":1013,
+     "humidity":72
+  },
+  "visibility":10000,
+  "wind":{
+     "speed":5.75,
+     "deg":20
+  },
+  "clouds":{
+     "all":100
+  },
+  "dt":1677606072,
+  "sys":{
+     "type":1,
+     "id":4659,
+     "country":"US",
+     "sunrise":1677587008,
+     "sunset":1677627441
+  },
+  "timezone":-18000,
+  "id":4928096,
+  "name":"West Lafayette",
+  "cod":200
 }

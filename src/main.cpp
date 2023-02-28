@@ -13,7 +13,9 @@
 #include "pin_config.h"
 #include "secrets.h"
 
+#include <string>
 #include <Arduino.h>
+#include <Arduino_JSON.h>
 #include <WifiLocation.h>
 #include "time.h"
 
@@ -124,7 +126,6 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
   } else {
     data->state = LV_INDEV_STATE_REL;
   }
-  lv_msg_send(MSG_TOUCH_UPDATE, &p);
 }
 
 void setup() {
@@ -143,10 +144,9 @@ void setup() {
   xl.pinMode8(0, pin, OUTPUT);
   xl.digitalWrite(PWR_EN_PIN, 1);
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, 175);
+  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
 
   SD_init();
-  xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
 
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(100);
@@ -255,6 +255,7 @@ void setup() {
 
   System.is_asleep = false;
   ui_init();
+  xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
 }
 
 void loop() {
@@ -403,61 +404,63 @@ void wifi_task(void *param) {
   String rsp;
   bool is_get_http = false;
 
-  static u_int32_t TimeMillis = millis();
+  static u_int32_t time_millis = 0;
+  static u_int32_t weather_millis = 0;
   char time_buf[6];
   char date_buf[24];
 
+  JSONVar weather_data;
+
   do {
 
-    if (millis() - TimeMillis > 5000) {
+    if (millis() - time_millis > 5000 || time_millis == 0) {
       if(!getLocalTime(&timeinfo)){
         Serial.println("Failed to obtain time");
       } else {
-        sprintf(time_buf, "%d:%02d", timeinfo.tm_hour, timeinfo.tm_min);
+        sprintf(time_buf, "%d:%02d", (timeinfo.tm_hour % 12), timeinfo.tm_min);
         lv_msg_send(MSG_TIME_UPDATE, time_buf);
 
         strftime(date_buf, sizeof(date_buf), "%A, %b %d", &timeinfo);
         lv_msg_send(MSG_DATE_UPDATE, date_buf);
       }
 
-      TimeMillis = millis();
+      time_millis = millis();
     }
 
 
-    /*
-    http_client.begin("https://trevinsmall.com");
-    str = "getting json data";
-    lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
-
-    int http_code = http_client.GET();
-    Serial.println(http_code);
-    if (http_code > 0) {
+    if (millis() - weather_millis > 1200000 || weather_millis == 0) {
+      http_client.begin(WEATHER_API);
+      int http_code = http_client.GET();
       Serial.printf("HTTP get code: %d\n", http_code);
-      if (http_code == HTTP_CODE_OK) {
-        rsp = http_client.getString();
-        Serial.println(rsp);
-        is_get_http = true;
-        str += rsp;
-        lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
+      if (http_code > 0) {
+        if (http_code == HTTP_CODE_OK) {
+          rsp = http_client.getString();
+          weather_data = JSON.parse(rsp);
+          int weather_id = std::atoi(JSON.stringify(weather_data["weather"][0]["id"]).c_str());
+          String temperature = JSON.stringify(weather_data["main"]["temp"]).substring(0, 2) + "F";
+          lv_msg_send(MSG_TEMPERATURE_UPDATE, temperature.c_str());
+          lv_msg_send(MSG_WEATHER_ICON_UPDATE, &weather_id);
+        } else {
+          Serial.printf("fail to get http client,code:%d\n", http_code);
+          is_get_http = true;
+        }
       } else {
-        Serial.printf("fail to get http client,code:%d\n", http_code);
+        Serial.println("HTTP GET failed.");
+        is_get_http = true;
       }
-    } else {
-      Serial.println("HTTP GET failed. Try again");
-      str = "HTTP GET failed. Try again";
-      lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
+
+      weather_millis = millis();
     }
-    */
 
     delay(100);
+
   } while (!is_get_http);
 
-  WiFi.disconnect();
   http_client.end();
+  WiFi.disconnect();
 
   str = "#00ff00 WIFI detection function completed #";
-  //lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
 
   vTaskDelete(NULL);
 }
@@ -479,8 +482,8 @@ void deep_sleep(void) {
   */
   delay(500);
 
-  //esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
-  //esp_deep_sleep_start();
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+  esp_deep_sleep_start();
 
   System.is_asleep = false;
 }

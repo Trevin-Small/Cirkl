@@ -3,7 +3,6 @@
 #include "apps.h"
 
 void device_sleep_cb() {
-
     System.is_asleep = true;
     deep_sleep();
 }
@@ -12,6 +11,25 @@ void update_label_event_cb(lv_event_t * e) {
   lv_obj_t * label = lv_event_get_target(e);
   lv_msg_t * m = lv_event_get_msg(e);
   lv_label_set_text(label, lv_msg_get_payload(m));
+}
+
+void update_weather_icon_event_cb(lv_event_t * e) {
+  lv_obj_t * img = lv_event_get_target(e);
+  lv_msg_t * m = lv_event_get_msg(e);
+  const int * id = lv_msg_get_payload(m);
+
+  if(*id > 800) {
+    lv_img_set_src(img, &ui_img_weather_cloud_png);
+  } else if (*id == 800) {
+    lv_img_set_src(img, &ui_img_weather_sun_png);
+  } else if (*id >= 700) {
+    lv_img_set_src(img, &ui_img_weather_fog_png);
+  } else if (*id >= 600) {
+    lv_img_set_src(img, &ui_img_weather_snow_png);
+  } else {
+    lv_img_set_src(img, &ui_img_weather_rain_png);
+  }
+
 }
 
 
@@ -45,11 +63,13 @@ lv_obj_t * create_info_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, lv_di
   ui_weather_img = new_ui_img(ui_weather_row, &ui_img_weather_rain_png, false, LV_ALIGN_CENTER, WEATHER_ICON_SIZE,
     WEATHER_ICON_SIZE, 0, 0);
 
-  ui_weather_label = new_ui_label(ui_weather_row, &sf_bold_30, "56F", LV_ALIGN_OUT_BOTTOM_MID, LV_SIZE_CONTENT,
+  ui_weather_label = new_ui_label(ui_weather_row, &sf_bold_30, "", LV_ALIGN_OUT_BOTTOM_MID, LV_SIZE_CONTENT,
     0, 0);
 
   ui_reminder_row = new_ui_flex_container(ui_col_container, LV_ALIGN_CENTER, LV_FLEX_FLOW_ROW, LV_FLEX_ALIGN_CENTER,
     LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_SIZE_CONTENT, LV_SIZE_CONTENT, 0, 0);
+
+  /*
 
   ui_reminder_bubble = lv_obj_create(ui_reminder_row);
   lv_obj_set_style_bg_color(ui_reminder_bubble, lv_palette_main(LV_PALETTE_RED), LV_STATE_DEFAULT);
@@ -61,16 +81,26 @@ lv_obj_t * create_info_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, lv_di
   ui_reminder_label = new_ui_label(ui_reminder_row, &sf_bold_16, "2 New Reminders", LV_ALIGN_OUT_BOTTOM_MID, LV_SIZE_CONTENT,
     0, 0);
 
+  */
+
+  lv_obj_set_style_pad_top(ui_date_label, 10, LV_STATE_DEFAULT);
+
   lv_obj_set_style_text_color(ui_clock_label, System.font_accent_color, LV_STATE_DEFAULT);
   lv_obj_set_style_text_color(ui_date_label, System.font_main_color, LV_STATE_DEFAULT);
   lv_obj_set_style_text_color(ui_weather_label, System.font_main_color, LV_STATE_DEFAULT);
-  lv_obj_set_style_text_color(ui_reminder_label, System.font_main_color, LV_STATE_DEFAULT);
+  //lv_obj_set_style_text_color(ui_reminder_label, System.font_main_color, LV_STATE_DEFAULT);
 
   lv_obj_add_event_cb(ui_clock_label, update_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
   lv_msg_subsribe_obj(MSG_TIME_UPDATE, ui_clock_label, NULL);
 
   lv_obj_add_event_cb(ui_date_label, update_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
   lv_msg_subsribe_obj(MSG_DATE_UPDATE, ui_date_label, NULL);
+
+  lv_obj_add_event_cb(ui_weather_label, update_label_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+  lv_msg_subsribe_obj(MSG_TEMPERATURE_UPDATE, ui_weather_label, NULL);
+
+  lv_obj_add_event_cb(ui_weather_img, update_weather_icon_event_cb, LV_EVENT_MSG_RECEIVED, NULL);
+  lv_msg_subsribe_obj(MSG_WEATHER_ICON_UPDATE, ui_weather_img, NULL);
 
   return ui_info_tile;
 }
