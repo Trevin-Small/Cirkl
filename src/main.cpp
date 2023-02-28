@@ -141,7 +141,7 @@ void setup() {
   xl.pinMode8(0, pin, OUTPUT);
   xl.digitalWrite(PWR_EN_PIN, 1);
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, 175);
   SD_init();
 
   xl.digitalWrite(TP_RES_PIN, 0);
@@ -263,7 +263,7 @@ void loop() {
     lv_timer_handler();
   }
 
-  if (millis() - Millis > 50) {
+  if (millis() - Millis > 500) {
     //float v = (analogRead(BAT_VOLT_PIN) * 2 * 3.3) / 4096;
     //lv_msg_send(MSG_BAT_VOLT_UPDATE, &v);
     Millis = millis();
@@ -370,7 +370,11 @@ void wifi_task(void *param) {
   WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   delay(100);
+
+  Serial.println("MAC Address: " + WiFi.macAddress());
+
   Serial.println("scan start");
+
   str = "wifi scan start";
   lv_msg_send(MSG_WIFI_UPDATE, str.c_str());
   delay(1000);

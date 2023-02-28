@@ -1,0 +1,10 @@
+{
+
+  "message": "Hello, World!",
+  "data": {
+    "time": "1:30",
+    "date": "Thursday, Feb 28",
+    "temp": "40F"
+  }
+
+}
