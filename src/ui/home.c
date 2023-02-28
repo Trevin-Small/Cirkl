@@ -52,15 +52,15 @@ lv_obj_t * create_info_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, lv_di
   ui_col_container = new_ui_flex_container(ui_info_tile, LV_ALIGN_CENTER, LV_FLEX_FLOW_COLUMN, LV_FLEX_ALIGN_START,
     LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_SIZE_CONTENT, LV_SIZE_CONTENT, 0, 0);
 
-  ui_clock_label = new_ui_label(ui_col_container, &sf_bold_84, "0:00", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
+  ui_clock_label = new_ui_label(ui_col_container, &sf_bold_84, "", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
 
-  ui_date_label = new_ui_label(ui_col_container, &sf_bold_22, "", LV_ALIGN_CENTER,
+  ui_date_label = new_ui_label(ui_col_container, &sf_bold_22, "Connecting to WiFi..", LV_ALIGN_CENTER,
     LV_SIZE_CONTENT, 0, 0);
 
   ui_weather_row = new_ui_flex_container(ui_col_container, LV_ALIGN_CENTER, LV_FLEX_FLOW_ROW, LV_FLEX_ALIGN_CENTER,
     LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_SIZE_CONTENT, LV_SIZE_CONTENT, 0, 0);
 
-  ui_weather_img = new_ui_img(ui_weather_row, &ui_img_weather_rain_png, false, LV_ALIGN_CENTER, WEATHER_ICON_SIZE,
+  ui_weather_img = new_ui_img(ui_weather_row, NULL, false, LV_ALIGN_CENTER, WEATHER_ICON_SIZE,
     WEATHER_ICON_SIZE, 0, 0);
 
   ui_weather_label = new_ui_label(ui_weather_row, &sf_bold_30, "", LV_ALIGN_OUT_BOTTOM_MID, LV_SIZE_CONTENT,
