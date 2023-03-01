@@ -18,16 +18,16 @@ backend will be built which Cirkl can communicate with. This will allow Cirkl to
 - User B's Cirkl pings, displaying a notification that it received a new message. User B can now view the image sent to their device.
 - The same process can happen in reverse with user B sending a message to user A's Cirkl.
 
-# Features Already Implemented:
+# Features already implemented:
 - Internet time and weather
-- App extensibility (for future feature additions)
+- Simple App extensibility (system handles app routing, open, & close), so apps are simple to develop
 
-# Features Cirkl will implement:
+# Features to be implemented:
+- SD Card support (offline message storage, device settings, etc)
+- Settings app to modify device color scheme and other configurations
 - Support sharing photos, text, and drawings
 - "Gallery" mode - flip through x amount of most recent messages
 - Fetch and display your reminders from Google Calendar
-- Settings app to modify device color scheme and other configurations
-- SD Card support (offline message storage, device settings, etc)
 
 # What's it built with?
 - LilyGO T-RGB board and touch-screen display
