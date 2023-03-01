@@ -1,9 +1,18 @@
+// Library Includes
+#include <string>
+#include <Arduino.h>
+#include <Arduino_JSON.h>
+#include <WifiLocation.h>
+#include "time.h"
 #include "HTTPClient.h"
 #include "SD_MMC.h"
 #include "WiFi.h"
 #include "Wire.h"
 #include "SPI.h"
 #include "lvgl.h"
+#include "TouchLib.h"
+
+// Local Includes
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
@@ -12,22 +21,6 @@
 #include "ui.h"
 #include "pin_config.h"
 #include "secrets.h"
-
-#include <string>
-#include <Arduino.h>
-#include <Arduino_JSON.h>
-#include <WifiLocation.h>
-#include "time.h"
-
-#define TOUCH_MODULE_CST820
-// #define TOUCH_MODULE_FT3267
-
-#if defined(TOUCH_MODULE_FT3267)
-#include "ft3267.h"
-#elif defined(TOUCH_MODULE_CST820)
-#define TOUCH_MODULES_CST_SELF
-#include "TouchLib.h"
-#endif
 
 typedef struct {
   uint8_t cmd;
@@ -83,9 +76,7 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0, {0}, 0xff}};
 
 XL9535 xl;
-#if defined(TOUCH_MODULE_CST820)
 TouchLib touch(Wire, IIC_SDA_PIN, IIC_SCL_PIN, CTS820_SLAVE_ADDRESS);
-#endif
 
 bool touch_pin_get_int = false;
 void deep_sleep(void);
@@ -108,19 +99,10 @@ static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_
 static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data) {
 
   touch_point_t p = {0};
-  // if (touch_pin_get_int) {
-#if defined(TOUCH_MODULE_FT3267)
-    uint8_t touch_points_num;
-    ft3267_read_pos(&touch_points_num, &p.x, &p.y);
-    data->point.x = p.x;
-    data->point.y = p.y;
-#elif defined(TOUCH_MODULE_CST820)
-    if(touch.read()){
-      // touch.read();
+  if(touch.read()){
     TP_Point t = touch.getPoint(0);
     data->point.x = p.x = t.x;
     data->point.y = p.y = t.y;
-#endif
     data->state = LV_INDEV_STATE_PR;
     touch_pin_get_int = false;
   } else {
@@ -151,13 +133,8 @@ void setup() {
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(100);
   xl.digitalWrite(TP_RES_PIN, 1);
-  //delay(0);
   //scan_iic();
-#if defined(TOUCH_MODULE_FT3267)
-  ft3267_init(Wire);
-#elif defined(TOUCH_MODULE_CST820)
   touch.init();
-#endif
   tft_init();
   esp_lcd_rgb_panel_config_t panel_config = {
       .clk_src = LCD_CLK_SRC_PLL160M,

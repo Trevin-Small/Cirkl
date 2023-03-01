@@ -15,7 +15,7 @@ const uint32_t * colors = color_palettes[COLOR_PALETTE];
     #error "LV_COLOR_16_SWAP should be 0 to match the display requirements"
 #endif
 
-///////////////////// ANIMATIONS ////////////////////
+//////////////////////////// MAIN ///////////////////////////
 
 void ui_init( void ) {
 
