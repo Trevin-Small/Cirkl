@@ -408,6 +408,7 @@ void wifi_task(void *param) {
   static u_int32_t weather_millis = 0;
   char time_buf[6];
   char date_buf[24];
+  int * icon_data[2];
 
   JSONVar weather_data;
 
@@ -436,11 +437,17 @@ void wifi_task(void *param) {
       if (http_code > 0) {
         if (http_code == HTTP_CODE_OK) {
           rsp = http_client.getString();
+          Serial.println(rsp);
           weather_data = JSON.parse(rsp);
-          int weather_id = std::atoi(JSON.stringify(weather_data["weather"][0]["id"]).c_str());
+
           String temperature = JSON.stringify(weather_data["main"]["temp"]).substring(0, 2) + "F";
           lv_msg_send(MSG_TEMPERATURE_UPDATE, temperature.c_str());
-          lv_msg_send(MSG_WEATHER_ICON_UPDATE, &weather_id);
+
+          int weather_id = std::atoi(JSON.stringify(weather_data["weather"][0]["id"]).c_str());
+          int weather_day = JSON.stringify(weather_data["weather"][0]["icon"]).c_str()[2] == 'd' ? 1 : 0;
+          icon_data[0] = &weather_id;
+          icon_data[1] = &weather_day;
+          lv_msg_send(MSG_WEATHER_ICON_UPDATE, &icon_data);
         } else {
           Serial.printf("fail to get http client,code:%d\n", http_code);
           is_get_http = true;

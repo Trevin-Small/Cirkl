@@ -16,15 +16,25 @@ void update_label_event_cb(lv_event_t * e) {
 void update_weather_icon_event_cb(lv_event_t * e) {
   lv_obj_t * img = lv_event_get_target(e);
   lv_msg_t * m = lv_event_get_msg(e);
-  const int * id = lv_msg_get_payload(m);
+  const int * data = lv_msg_get_payload(m);
+  int id = data[0];
+  int day = data[1];
 
-  if(*id > 800) {
-    lv_img_set_src(img, &ui_img_weather_cloud_png);
-  } else if (*id == 800) {
-    lv_img_set_src(img, &ui_img_weather_sun_png);
-  } else if (*id >= 700) {
+  if(id > 800) {
+    if (day == 1) {
+      lv_img_set_src(img, &ui_img_weather_cloud_d_png);
+    } else {
+      lv_img_set_src(img, &ui_img_weather_cloud_n_png);
+    }
+  } else if (id == 800) {
+    if (day == 1) {
+      lv_img_set_src(img, &ui_img_weather_sun_png);
+    } else {
+      lv_img_set_src(img, &ui_img_weather_moon_png);
+    }
+  } else if (id >= 700) {
     lv_img_set_src(img, &ui_img_weather_fog_png);
-  } else if (*id >= 600) {
+  } else if (id >= 600) {
     lv_img_set_src(img, &ui_img_weather_snow_png);
   } else {
     lv_img_set_src(img, &ui_img_weather_rain_png);

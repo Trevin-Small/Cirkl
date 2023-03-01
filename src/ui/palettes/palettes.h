@@ -1,6 +1,6 @@
 #include "ui.h"
 
-#define COLOR_PALETTE 0
+#define COLOR_PALETTE 1
 
 const uint32_t color_palettes[2][4] = {
 
