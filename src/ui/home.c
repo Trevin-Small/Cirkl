@@ -2,6 +2,8 @@
 #include "ui_lib.h"
 #include "apps.h"
 
+#include <Arduino.h>
+
 void device_sleep_cb() {
     System.is_asleep = true;
     deep_sleep();
