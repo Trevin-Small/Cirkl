@@ -1,11 +1,7 @@
+#include "system.h"
 #include "ui.h"
 #include "apps.h"
 #include "palettes/palettes.h"
-
-///////////////////// VARIABLES ////////////////////
-
-system_t System;
-const uint32_t * colors = color_palettes[COLOR_PALETTE];
 
 ///////////////////// TEST LVGL SETTINGS ////////////////////
 #if LV_COLOR_DEPTH != 16
@@ -18,6 +14,8 @@ const uint32_t * colors = color_palettes[COLOR_PALETTE];
 //////////////////////////// MAIN ///////////////////////////
 
 void ui_init( void ) {
+
+    const uint32_t * colors = color_palettes[COLOR_PALETTE];
 
     System.theme_main_color = lv_color_hex(colors[0]);
     System.font_main_color = lv_color_hex(colors[1]);

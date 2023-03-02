@@ -1,3 +1,4 @@
+#include "system.h"
 #include "ui.h"
 #include "ui_lib.h"
 #include "apps.h"

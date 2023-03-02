@@ -18,19 +18,20 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 #include "./hardware_drivers/XL9535_driver.h"
+#include "system.h"
 #include "ui.h"
 #include "pin_config.h"
 #include "secrets.h"
+
+system_t System;
+esp_lcd_panel_handle_t panel_handle = NULL;
+u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
 
 typedef struct {
   uint8_t cmd;
   uint8_t data[16];
   uint8_t databytes; // No of data in data; bit 7 = delay after set; 0xFF = end of cmds.
 } lcd_init_cmd_t;
-
-esp_lcd_panel_handle_t panel_handle = NULL;
-
-u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
 
 DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0xFF, {0x77, 0x01, 0x00, 0x00, 0x10}, 0x05},
@@ -81,12 +82,13 @@ XL9535 xl;
 TouchLib touch(Wire, IIC_SDA_PIN, IIC_SCL_PIN, CTS820_SLAVE_ADDRESS);
 
 bool touch_pin_get_int = false;
-void deep_sleep(void);
 void SD_init(void);
 void tft_init(void);
 void lcd_cmd(const uint8_t cmd);
 void lcd_data(const uint8_t *data, int len);
+void interacted();
 void wifi_task(void *param);
+void deep_sleep(void);
 
 static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map) {
   esp_lcd_panel_handle_t panel_handle = (esp_lcd_panel_handle_t)drv->user_data;
@@ -113,6 +115,9 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
 }
 
 void setup() {
+  System.sleep_delay = SYS_SLEEP_DELAY;
+  System.brightness = BRIGHTNESS_DEFAULT;
+
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
   static lv_indev_drv_t indev_drv;
@@ -127,9 +132,8 @@ void setup() {
 
   xl.pinMode8(0, pin, OUTPUT);
   xl.digitalWrite(PWR_EN_PIN, 1);
-  System.brightness = BRIGHTNESS_DEFAULT;
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_DEFAULT);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
 
   SD_init();
 
@@ -230,7 +234,7 @@ void setup() {
   // Touchscreen interrupt pin
   pinMode(TP_INT_PIN, INPUT_PULLUP);
   attachInterrupt(
-      TP_INT_PIN, [] { touch_pin_get_int = true; }, FALLING);
+      TP_INT_PIN, interacted, FALLING);
 
 
   System.is_asleep = false;
@@ -240,20 +244,25 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  static uint32_t Millis;
   delay(2);
 
   if (!System.is_asleep) {
     lv_timer_handler();
   }
 
-  if (millis() - Millis > 500) {
-    Millis = millis();
-  }
+  if (millis() - System.last_check_millis > SYS_CHECK_INTERVAL) {
 
-  if (System.brightness != current_brightness) {
-    analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
-    current_brightness = System.brightness;
+    System.last_check_millis = millis();
+
+    if (System.brightness != current_brightness) {
+      analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+      current_brightness = System.brightness;
+    }
+
+    if (millis() - System.last_interact_time >= System.sleep_delay) {
+      deep_sleep();
+    }
+
   }
 
 }
@@ -349,6 +358,12 @@ void SD_init(void) {
   uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
 }
+
+void interacted() {
+  touch_pin_get_int = true;
+  System.last_interact_time = millis();
+}
+
 // This task is used to test WIFI, http test
 void wifi_task(void *param) {
 
@@ -417,8 +432,8 @@ void wifi_task(void *param) {
   String rsp;
   bool is_get_http = false;
 
-  static u_int32_t time_millis = 0;
-  static u_int32_t weather_millis = 0;
+  unsigned long time_millis = 0;
+  unsigned long weather_millis = 0;
   char time_buf[6];
   char date_buf[24];
   int icon_data[2];
@@ -431,7 +446,16 @@ void wifi_task(void *param) {
       if(!getLocalTime(&timeinfo)){
         Serial.println("Failed to obtain time");
       } else {
-        sprintf(time_buf, "%d:%02d", (timeinfo.tm_hour > 12 ? timeinfo.tm_hour - 12 : timeinfo.tm_hour), timeinfo.tm_min);
+
+        int hour = timeinfo.tm_hour;
+
+        if (hour == 0) {
+          hour = 12;
+        } else if (hour > 12) {
+          hour -= 12;
+        }
+
+        sprintf(time_buf, "%d:%02d", hour, timeinfo.tm_min);
         lv_msg_send(MSG_TIME_UPDATE, time_buf);
 
         strftime(date_buf, sizeof(date_buf), "%A, %b %d", &timeinfo);
@@ -487,7 +511,7 @@ void wifi_task(void *param) {
 
 void deep_sleep(void) {
 
-  /*
+  /* Old sleep code
   WiFi.disconnect();
   xl.pinMode8(0, 0xff, INPUT);
   xl.pinMode8(1, 0xff, INPUT);
@@ -496,6 +520,9 @@ void deep_sleep(void) {
   // If the SD card is initialized, it needs to be unmounted.
   if (SD_MMC.cardSize())
     SD_MMC.end();
+
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+  esp_deep_sleep_start();
   */
 
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
@@ -508,9 +535,7 @@ void deep_sleep(void) {
     delay(100);
   }
 
-  //esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
-  //esp_deep_sleep_start();
-
+  System.last_interact_time = millis();
   detachInterrupt(TP_INT_PIN);
   attachInterrupt(TP_INT_PIN, [] { touch_pin_get_int = true; }, FALLING);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
