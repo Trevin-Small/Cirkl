@@ -224,7 +224,7 @@ void setup() {
   disp_drv.flush_cb = example_lvgl_flush_cb;
   disp_drv.draw_buf = &disp_buf;
   disp_drv.user_data = panel_handle;
-  lv_disp_t *disp = lv_disp_drv_register(&disp_drv);
+  System.display = lv_disp_drv_register(&disp_drv);
 
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
@@ -528,6 +528,8 @@ void deep_sleep(void) {
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
   detachInterrupt(TP_INT_PIN);
   System.is_asleep = true;
+  lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
+  lv_refr_now(System.display);
   delay(500);
   attachInterrupt(TP_INT_PIN, [] { System.is_asleep = false; }, CHANGE);
 
