@@ -528,8 +528,12 @@ void deep_sleep(void) {
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
   detachInterrupt(TP_INT_PIN);
   System.is_asleep = true;
-  lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
-  lv_refr_now(System.display);
+
+  if (System.app_list_tile == lv_tileview_get_tile_act(System.main_tile_view)) {
+    lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
+    lv_refr_now(System.display);
+  }
+
   delay(500);
   attachInterrupt(TP_INT_PIN, [] { System.is_asleep = false; }, CHANGE);
 
