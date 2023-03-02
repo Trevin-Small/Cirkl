@@ -17,6 +17,11 @@
 #define APP_ICON_SIZE      96
 #define APP_GRID_SIZE     128
 
+#define BRIGHTNESS_MAX     254
+#define BRIGHTNESS_MIN      50
+#define BRIGHTNESS_DEFAULT 200
+#define BRIGHTNESS_OFF       0
+
 #include "stdint.h"
 
 typedef struct {
@@ -41,7 +46,7 @@ extern "C" {
 #endif
 
 typedef struct system {
-
+    int32_t brightness;
     lv_color_t theme_main_color;
     lv_color_t theme_accent_color;
     lv_color_t font_main_color;

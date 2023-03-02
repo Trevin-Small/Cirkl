@@ -4,11 +4,6 @@
 
 #include <Arduino.h>
 
-void device_sleep_cb() {
-    System.is_asleep = true;
-    deep_sleep();
-}
-
 void update_label_event_cb(lv_event_t * e) {
   lv_obj_t * label = lv_event_get_target(e);
   lv_msg_t * m = lv_event_get_msg(e);
@@ -173,8 +168,9 @@ lv_obj_t * create_app_list_tile(lv_obj_t * parent, u_int8_t col, u_int8_t row, l
   ui_shutdown_btn = new_ui_img_btn(ui_grid, &ui_img_shutdown_png, LV_ALIGN_CENTER, APP_ICON_SIZE, APP_ICON_SIZE, 0, 0);
   ui_shutdown_label = new_ui_label(ui_shutdown_btn, &sf_bold_16, "Shutdown", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
   lv_obj_align_to(ui_shutdown_label, ui_shutdown_btn, LV_ALIGN_OUT_BOTTOM_MID, 0, 0);
-  lv_obj_add_event_cb(ui_shutdown_btn, device_sleep_cb, LV_EVENT_CLICKED, NULL);
+  lv_obj_add_event_cb(ui_shutdown_btn, deep_sleep, LV_EVENT_CLICKED, NULL);
 
+  lv_obj_clear_flag( ui_grid, LV_OBJ_FLAG_SCROLLABLE );
 
   lv_obj_set_grid_cell(ui_gallery_btn, LV_GRID_ALIGN_STRETCH, 0, 1, LV_GRID_ALIGN_STRETCH, 0, 1);
   lv_obj_set_grid_cell(ui_calendar_btn, LV_GRID_ALIGN_STRETCH, 1, 1, LV_GRID_ALIGN_STRETCH, 0, 1);

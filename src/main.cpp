@@ -30,6 +30,8 @@ typedef struct {
 
 esp_lcd_panel_handle_t panel_handle = NULL;
 
+u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
+
 DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0xFF, {0x77, 0x01, 0x00, 0x00, 0x10}, 0x05},
     {0xC0, {0x3b, 0x00}, 0x02},
@@ -125,8 +127,9 @@ void setup() {
 
   xl.pinMode8(0, pin, OUTPUT);
   xl.digitalWrite(PWR_EN_PIN, 1);
+  System.brightness = BRIGHTNESS_DEFAULT;
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_ON_LEVEL);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_DEFAULT);
 
   SD_init();
 
@@ -248,6 +251,11 @@ void loop() {
     Millis = millis();
   }
 
+  if (System.brightness != current_brightness) {
+    analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+    current_brightness = System.brightness;
+  }
+
 }
 
 void lcd_send_data(uint8_t data) {
@@ -344,6 +352,33 @@ void SD_init(void) {
 // This task is used to test WIFI, http test
 void wifi_task(void *param) {
 
+  WiFi.disconnect();
+  WiFi.mode(WIFI_STA);
+  delay(100);
+  Serial.println("scan start");
+  delay(1000);
+  // WiFi.scanNetworks will return the number of networks found
+  int n = WiFi.scanNetworks();
+  Serial.println("scan done");
+  if (n == 0) {
+    Serial.println("no networks found");
+  } else {
+    Serial.print(n);
+    Serial.println(" networks found");
+    for (int i = 0; i < n; ++i) {
+      // Print SSID and RSSI for each network found
+      Serial.print(i + 1);
+      Serial.print(": ");
+      Serial.print(WiFi.SSID(i));
+      Serial.print(" (");
+      Serial.print(WiFi.RSSI(i));
+      Serial.print(")");
+      Serial.println((WiFi.encryptionType(i) == WIFI_AUTH_OPEN) ? " " : "*");
+    }
+  }
+  Serial.println("");
+  WiFi.disconnect();
+
   const char* ntpServer = "pool.ntp.org";
   const long  gmtOffset_sec = -18000;
   const int   daylightOffset_sec = 3600;
@@ -373,9 +408,10 @@ void wifi_task(void *param) {
   while (WiFi.status() != WL_CONNECTED) {
     Serial.print(".");
     vTaskDelay(100);
-
   }
+
   Serial.printf("\r\n-- wifi connect success! --\r\n");
+  Serial.println("Connected to: " + WiFi.SSID());
 
   delay(100);
   String rsp;
@@ -395,7 +431,7 @@ void wifi_task(void *param) {
       if(!getLocalTime(&timeinfo)){
         Serial.println("Failed to obtain time");
       } else {
-        sprintf(time_buf, "%d:%02d", (timeinfo.tm_hour % 12), timeinfo.tm_min);
+        sprintf(time_buf, "%d:%02d", (timeinfo.tm_hour > 12 ? timeinfo.tm_hour - 12 : timeinfo.tm_hour), timeinfo.tm_min);
         lv_msg_send(MSG_TIME_UPDATE, time_buf);
 
         strftime(date_buf, sizeof(date_buf), "%A, %b %d", &timeinfo);
@@ -451,23 +487,32 @@ void wifi_task(void *param) {
 
 void deep_sleep(void) {
 
-  digitalWrite(EXAMPLE_PIN_NUM_BK_LIGHT, EXAMPLE_LCD_BK_LIGHT_OFF_LEVEL);
-
-  //WiFi.disconnect();
-  detachInterrupt(TP_INT_PIN);
+  /*
+  WiFi.disconnect();
   xl.pinMode8(0, 0xff, INPUT);
   xl.pinMode8(1, 0xff, INPUT);
   xl.read_all_reg();
 
   // If the SD card is initialized, it needs to be unmounted.
-  /*
   if (SD_MMC.cardSize())
     SD_MMC.end();
   */
+
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
+  detachInterrupt(TP_INT_PIN);
+  System.is_asleep = true;
   delay(500);
+  attachInterrupt(TP_INT_PIN, [] { System.is_asleep = false; }, CHANGE);
 
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
-  esp_deep_sleep_start();
+  while (System.is_asleep) {
+    delay(100);
+  }
 
-  System.is_asleep = false;
+  //esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+  //esp_deep_sleep_start();
+
+  detachInterrupt(TP_INT_PIN);
+  attachInterrupt(TP_INT_PIN, [] { touch_pin_get_int = true; }, FALLING);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+
 }
