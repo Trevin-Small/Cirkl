@@ -1,5 +1,16 @@
-// Library Includes
+// Local Includes
 #include <string>
+#include "esp_lcd_panel_io.h"
+#include "esp_lcd_panel_ops.h"
+#include "esp_lcd_panel_rgb.h"
+#include "esp_lcd_panel_vendor.h"
+#include "./hardware_drivers/XL9535_driver.h"
+#include "system.h"
+#include "ui.h"
+#include "pin_config.h"
+#include "secrets.h"
+
+// Library Includes
 #include <Arduino.h>
 #include <Arduino_JSON.h>
 #include <WifiLocation.h>
@@ -11,17 +22,6 @@
 #include "SPI.h"
 #include "lvgl.h"
 #include "TouchLib.h"
-
-// Local Includes
-#include "esp_lcd_panel_io.h"
-#include "esp_lcd_panel_ops.h"
-#include "esp_lcd_panel_rgb.h"
-#include "esp_lcd_panel_vendor.h"
-#include "./hardware_drivers/XL9535_driver.h"
-#include "system.h"
-#include "ui.h"
-#include "pin_config.h"
-#include "secrets.h"
 
 system_t System;
 esp_lcd_panel_handle_t panel_handle = NULL;
@@ -88,7 +88,8 @@ void lcd_cmd(const uint8_t cmd);
 void lcd_data(const uint8_t *data, int len);
 void interacted();
 void wifi_task(void *param);
-void deep_sleep(void);
+void sleep(void);
+void shutdown(void);
 
 static void example_lvgl_flush_cb(lv_disp_drv_t *drv, const lv_area_t *area, lv_color_t *color_map) {
   esp_lcd_panel_handle_t panel_handle = (esp_lcd_panel_handle_t)drv->user_data;
@@ -117,13 +118,13 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
 void setup() {
   System.sleep_delay = SYS_SLEEP_DELAY;
   System.brightness = BRIGHTNESS_DEFAULT;
+  System.is_asleep = false;
+  System.wifi_active = true;
 
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // contains callback functions
   static lv_indev_drv_t indev_drv;
   // put your setup code here, to run once:
-  pinMode(BAT_VOLT_PIN, ANALOG);
-
   Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
   Serial.begin(115200);
   xl.begin();
@@ -134,12 +135,12 @@ void setup() {
   xl.digitalWrite(PWR_EN_PIN, 1);
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
-
   SD_init();
 
   xl.digitalWrite(TP_RES_PIN, 0);
-  delay(100);
+  delay(200);
   xl.digitalWrite(TP_RES_PIN, 1);
+  delay(200);
   //scan_iic();
   touch.init();
   tft_init();
@@ -237,7 +238,6 @@ void setup() {
       TP_INT_PIN, interacted, FALLING);
 
 
-  System.is_asleep = false;
   ui_init();
   xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
 }
@@ -248,19 +248,21 @@ void loop() {
 
   if (!System.is_asleep) {
     lv_timer_handler();
-  }
 
-  if (millis() - System.last_check_millis > SYS_CHECK_INTERVAL) {
 
-    System.last_check_millis = millis();
+    if (millis() - System.last_check_millis > SYS_CHECK_INTERVAL) {
 
-    if (System.brightness != current_brightness) {
-      analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
-      current_brightness = System.brightness;
-    }
+      System.last_check_millis = millis();
 
-    if (millis() - System.last_interact_time >= System.sleep_delay) {
-      deep_sleep();
+      if (System.brightness != current_brightness) {
+        analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+        current_brightness = System.brightness;
+      }
+
+      if (millis() - System.last_interact_time >= System.sleep_delay) {
+        sleep();
+      }
+
     }
 
   }
@@ -367,11 +369,10 @@ void interacted() {
 // This task is used to test WIFI, http test
 void wifi_task(void *param) {
 
-  WiFi.disconnect();
   WiFi.mode(WIFI_STA);
   delay(100);
   Serial.println("scan start");
-  delay(1000);
+  delay(500);
   // WiFi.scanNetworks will return the number of networks found
   int n = WiFi.scanNetworks();
   Serial.println("scan done");
@@ -394,30 +395,7 @@ void wifi_task(void *param) {
   Serial.println("");
   WiFi.disconnect();
 
-  const char* ntpServer = "pool.ntp.org";
-  const long  gmtOffset_sec = -18000;
-  const int   daylightOffset_sec = 3600;
-
-  //WifiLocation location (GOOGLE_API_KEY);
-  //location_t loc = location.getGeoFromWiFi();
-  /*
-    Serial.println("Location request data");
-    Serial.println(location.getSurroundingWiFiJson()+"\n");
-    Serial.println ("Location: " + String (loc.lat, 7) + "," + String (loc.lon, 7));
-    //Serial.println("Longitude: " + String(loc.lon, 7));
-    Serial.println ("Accuracy: " + String (loc.accuracy));
-    Serial.println ("Result: " + location.wlStatusStr (location.getStatus ()));
-  */
-  struct tm timeinfo;
-
-  // Init and get the time
-  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-
-  String str;
-  HTTPClient http_client;
-  WiFi.disconnect();
-
-  delay(100);
+  WifiLocation location(MAPS_API_KEY);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
@@ -427,6 +405,20 @@ void wifi_task(void *param) {
 
   Serial.printf("\r\n-- wifi connect success! --\r\n");
   Serial.println("Connected to: " + WiFi.SSID());
+
+  location_t loc = location.getGeoFromWiFi();
+  Serial.printf("Lat: %f, Lon: %f\n", loc.lat, loc.lon);
+
+  const char* ntpServer = "pool.ntp.org";
+  const long  gmtOffset_sec = -18000;
+  const int   daylightOffset_sec = 3600;
+  struct tm timeinfo;
+
+  // Init and get the time
+  configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
+
+  String str;
+  HTTPClient http_client;
 
   delay(100);
   String rsp;
@@ -460,6 +452,11 @@ void wifi_task(void *param) {
 
         strftime(date_buf, sizeof(date_buf), "%A, %b %d", &timeinfo);
         lv_msg_send(MSG_DATE_UPDATE, date_buf);
+
+        if (System.is_asleep) {
+          lv_refr_now(System.display);
+        }
+
       }
 
       time_millis = millis();
@@ -467,7 +464,9 @@ void wifi_task(void *param) {
 
 
     if (millis() - weather_millis > 1200000 || weather_millis == 0) {
-      http_client.begin(WEATHER_API);
+      String weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + String(loc.lat) + "&lon=" + String(loc.lon) + "&appid=" + String(WEATHER_API_KEY) + "&units=imperial";
+      Serial.println(weather_url.c_str());
+      http_client.begin(weather_url.c_str());
       int http_code = http_client.GET();
       Serial.printf("HTTP get code: %d\n", http_code);
 
@@ -485,6 +484,11 @@ void wifi_task(void *param) {
           icon_data[0] = weather_id;
           icon_data[1] = weather_day;
           lv_msg_send(MSG_WEATHER_ICON_UPDATE, &icon_data);
+
+          if (System.is_asleep) {
+            lv_refr_now(System.display);
+          }
+
         } else {
           Serial.printf("fail to get http client,code:%d\n", http_code);
           is_get_http = true;
@@ -499,7 +503,7 @@ void wifi_task(void *param) {
 
     delay(100);
 
-  } while (!is_get_http);
+  } while (System.wifi_active);
 
   http_client.end();
   WiFi.disconnect();
@@ -509,21 +513,7 @@ void wifi_task(void *param) {
   vTaskDelete(NULL);
 }
 
-void deep_sleep(void) {
-
-  /* Old sleep code
-  WiFi.disconnect();
-  xl.pinMode8(0, 0xff, INPUT);
-  xl.pinMode8(1, 0xff, INPUT);
-  xl.read_all_reg();
-
-  // If the SD card is initialized, it needs to be unmounted.
-  if (SD_MMC.cardSize())
-    SD_MMC.end();
-
-  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
-  esp_deep_sleep_start();
-  */
+void sleep(void) {
 
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
   detachInterrupt(TP_INT_PIN);
@@ -545,5 +535,27 @@ void deep_sleep(void) {
   detachInterrupt(TP_INT_PIN);
   attachInterrupt(TP_INT_PIN, [] { touch_pin_get_int = true; }, FALLING);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+
+}
+
+void shutdown(void) {
+
+  System.is_asleep = true;
+  System.wifi_active = false;
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
+  WiFi.disconnect();
+  detachInterrupt(TP_INT_PIN);
+  xl.pinMode8(0, 0xff, INPUT);
+  xl.pinMode8(1, 0xff, INPUT);
+  xl.read_all_reg();
+
+  // If the SD card is initialized, it needs to be unmounted.
+  if (SD_MMC.cardSize())
+    SD_MMC.end();
+
+  delay(500);
+
+  esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+  esp_deep_sleep_start();
 
 }

@@ -37,7 +37,6 @@ LV_IMG_DECLARE( ui_img_weather_snow_png);
 LV_IMG_DECLARE( ui_img_weather_wind_png);
 LV_IMG_DECLARE( ui_img_weather_fog_png);
 
-void deep_sleep(void);
 void ui_init(void);
 
 #ifdef __cplusplus

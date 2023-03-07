@@ -19,8 +19,9 @@ typedef struct system {
     unsigned long last_interact_time;
     unsigned long last_check_millis;
     unsigned long sleep_delay;
-    bool app_is_open;
     bool is_asleep;
+    bool wifi_active;
+    bool app_is_open;
 
     lv_disp_t * display;
     lv_obj_t * active_screen;
@@ -39,6 +40,8 @@ typedef struct system {
 } system_t;
 
 extern system_t System;
+
+void shutdown(void);
 
 #ifdef __cplusplus
 } /*extern "C"*/
