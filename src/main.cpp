@@ -244,10 +244,11 @@ void setup() {
   fs_drv.read_cb = SD_read_file;
   fs_drv.write_cb = SD_write_file;
   fs_drv.seek_cb = SD_seek_file;
+  fs_drv.tell_cb = SD_tell_file;
 
-  fs_drv.dir_open_cb = SD_dir_open;
-  fs_drv.dir_read_cb = SD_dir_read;
-  fs_drv.dir_close_cb = SD_dir_close;
+  //fs_drv.dir_open_cb = SD_dir_open;
+  //fs_drv.dir_read_cb = SD_dir_read;
+  //fs_drv.dir_close_cb = SD_dir_close;
   lv_fs_drv_register(&fs_drv);
 
   // Touchscreen interrupt pin
