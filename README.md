@@ -7,7 +7,7 @@ Cirkl is a desktop IoT device built on [LilyGO's ESP32 T-RGB board](https://www.
 - Cirkl aims to revive the feeling you get from opening a sentimental letter in a 21st-century form factor. Cirkl provides its users a physical way to view photos, messages, and drawings that others have sent them, and is intended to be a lower volume, higher "meaning" form of communication.
 - Further, Cirkl also conveniently displays the time, weather, and calendar reminders right on your desk. Brilliant!
 
-![Cirkl Device](https://github.com/Trevin-Small/Cirkl/blob/main/cirkl_device/images/cirkl_device.jpg)
+![Cirkl Device](https://github.com/Trevin-Small/Cirkl/blob/main/repo_images/cirkl_device.jpg)
 
 Currently the firmware of the device is being developed. In the future, however, a web app with a Google Firebase
 backend will be built which Cirkl can communicate with. This will allow Cirkl to complete its purpose of photo sharing.

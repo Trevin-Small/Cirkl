@@ -5,6 +5,7 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 #include "./hardware_drivers/XL9535_driver.h"
+#include "./hardware_drivers/SD_driver.h"
 #include "system.h"
 #include "ui.h"
 #include "pin_config.h"
@@ -122,8 +123,10 @@ void setup() {
   System.wifi_active = true;
 
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
-  static lv_disp_drv_t disp_drv;      // contains callback functions
-  static lv_indev_drv_t indev_drv;
+  static lv_disp_drv_t disp_drv;      // lvgl display driver
+  static lv_indev_drv_t indev_drv;    // lvgl touch panel driver
+  static lv_fs_drv_t fs_drv;          // lvgl file system driver
+
   // put your setup code here, to run once:
   Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
   Serial.begin(115200);
@@ -227,10 +230,25 @@ void setup() {
   disp_drv.user_data = panel_handle;
   System.display = lv_disp_drv_register(&disp_drv);
 
+  // Register touch panel driver to LVGL
   lv_indev_drv_init(&indev_drv);
   indev_drv.type = LV_INDEV_TYPE_POINTER;
   indev_drv.read_cb = lv_touchpad_read;
   lv_indev_drv_register(&indev_drv);
+
+  // Register file system driver to LVGL
+  lv_fs_drv_init(&fs_drv);
+  fs_drv.letter = 'S';
+  fs_drv.open_cb = SD_open_file;
+  fs_drv.close_cb = SD_close_file;
+  fs_drv.read_cb = SD_read_file;
+  fs_drv.write_cb = SD_write_file;
+  fs_drv.seek_cb = SD_seek_file;
+
+  fs_drv.dir_open_cb = SD_dir_open;
+  fs_drv.dir_read_cb = SD_dir_read;
+  fs_drv.dir_close_cb = SD_dir_close;
+  lv_fs_drv_register(&fs_drv);
 
   // Touchscreen interrupt pin
   pinMode(TP_INT_PIN, INPUT_PULLUP);
@@ -333,6 +351,7 @@ void tft_init(void) {
 }
 
 void SD_init(void) {
+
   xl.digitalWrite(SD_CS_PIN, 1); // To use SDIO one-line mode, you need to pull the CS pin high
   SD_MMC.setPins(SD_CLK_PIN, SD_CMD_PIN, SD_D0_PIN);
   if (!SD_MMC.begin("/sdcard", true, true)) {
@@ -359,6 +378,29 @@ void SD_init(void) {
 
   uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
+
+  File file = SD_MMC.open("/settings.txt");
+  size_t len = file.size();
+  size_t flen = len;
+  uint8_t coords[512];
+
+  while (len) {
+    size_t toRead = len;
+    if (toRead > 512) {
+      toRead = 512;
+    }
+    file.read(coords, toRead);
+    len -= toRead;
+  }
+
+  Serial.print("settings.txt entries:\nCoordinates = ");
+  Serial.println((char *) coords);
+  /*
+  for (i = 0; i < size; i++) {
+    Serial.println( imgBuff[i] );
+  }*/
+
+  file.close();
 }
 
 void interacted() {
@@ -395,7 +437,7 @@ void wifi_task(void *param) {
   Serial.println("");
   WiFi.disconnect();
 
-  WifiLocation location(MAPS_API_KEY);
+  //WifiLocation location(MAPS_API_KEY);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
   while (WiFi.status() != WL_CONNECTED) {
@@ -406,8 +448,8 @@ void wifi_task(void *param) {
   Serial.printf("\r\n-- wifi connect success! --\r\n");
   Serial.println("Connected to: " + WiFi.SSID());
 
-  location_t loc = location.getGeoFromWiFi();
-  Serial.printf("Lat: %f, Lon: %f\n", loc.lat, loc.lon);
+  //location_t loc = location.getGeoFromWiFi();
+  //Serial.printf("Lat: %f, Lon: %f\n", loc.lat, loc.lon);
 
   const char* ntpServer = "pool.ntp.org";
   const long  gmtOffset_sec = -18000;
@@ -462,8 +504,9 @@ void wifi_task(void *param) {
       time_millis = millis();
     }
 
-
+    /*
     if (millis() - weather_millis > 1200000 || weather_millis == 0) {
+      loc = location.getGeoFromWiFi();
       String weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + String(loc.lat) + "&lon=" + String(loc.lon) + "&appid=" + String(WEATHER_API_KEY) + "&units=imperial";
       Serial.println(weather_url.c_str());
       http_client.begin(weather_url.c_str());
@@ -500,6 +543,7 @@ void wifi_task(void *param) {
 
       weather_millis = millis();
     }
+    */
 
     delay(100);
 
