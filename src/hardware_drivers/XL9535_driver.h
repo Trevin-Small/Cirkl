@@ -35,3 +35,5 @@ protected:
   TwoWire *_wire;
   bool is_found;
 };
+
+extern XL9535 xl;

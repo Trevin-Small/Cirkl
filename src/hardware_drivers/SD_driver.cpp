@@ -1,49 +1,56 @@
 #include "lvgl.h"
 #include "SD_driver.h"
+#include "system.h"
 #include "SD_MMC.h"
+#include "../pin_config.h"
+#include "../hardware_drivers/XL9535_driver.h"
 
 void * SD_open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
 
-  File * file = NULL;
+  File file;
 
+  Serial.print("Opening ");
   Serial.println(path);
 
   if (mode == LV_FS_MODE_RD) {
-    File file = SD_MMC.open(path, "r");
+    return SD_MMC.open(path, "r");
   } else if (mode == LV_FS_MODE_WR) {
-    File file = SD_MMC.open(path, "w");
+    return SD_MMC.open(path, "w");
   } else if (mode == LV_FS_MODE_RD | LV_FS_MODE_WR) {
-    File file = SD_MMC.open(path, "rw");
+    return SD_MMC.open(path, "rw");
   }
 
-  return file;
+  Serial.println("Bad open mode specified.");
+  return NULL;
+
 }
 
 lv_fs_res_t SD_close_file(lv_fs_drv_t * drv, void * fp) {
-  lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+  lv_fs_res_t res = LV_FS_RES_OK;
+
+  Serial.println("Closing file.");
 
   ((File *) (fp))->close();
+
+  delete ((File *) fp);
 
   return res;
 }
 
 lv_fs_res_t SD_read_file(_lv_fs_drv_t *drv, void * fp, void * buf, uint32_t btr, uint32_t * br) {
 
-  lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+  lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));
 
   *br = file.read((uint8_t *) buf, btr);
-
-  Serial.print("Bytes read: ");
-  Serial.println(*br);
 
   return res;
 
 }
 
 lv_fs_res_t SD_write_file(lv_fs_drv_t * drv, void * fp, const void * buf, uint32_t btw, uint32_t * bw) {
-  lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+  lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));
 
@@ -53,7 +60,7 @@ lv_fs_res_t SD_write_file(lv_fs_drv_t * drv, void * fp, const void * buf, uint32
 }
 
 lv_fs_res_t SD_seek_file(lv_fs_drv_t *drv, void *fp, uint32_t pos, lv_fs_whence_t whence) {
-  lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+  lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));
 
@@ -69,7 +76,7 @@ lv_fs_res_t SD_seek_file(lv_fs_drv_t *drv, void *fp, uint32_t pos, lv_fs_whence_
 }
 
 lv_fs_res_t SD_tell_file(_lv_fs_drv_t *drv, void *fp, uint32_t *pos_p) {
-  lv_fs_res_t res = LV_FS_RES_NOT_IMP;
+  lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));
 

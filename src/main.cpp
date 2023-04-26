@@ -14,7 +14,6 @@
 // Library Includes
 #include <Arduino.h>
 #include <Arduino_JSON.h>
-#include <WifiLocation.h>
 #include "time.h"
 #include "HTTPClient.h"
 #include "SD_MMC.h"
@@ -27,6 +26,13 @@
 system_t System;
 esp_lcd_panel_handle_t panel_handle = NULL;
 u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
+
+typedef struct location {
+  std::string lat;
+  std::string lon;
+} loc_t;
+
+loc_t location;
 
 typedef struct {
   uint8_t cmd;
@@ -212,6 +218,7 @@ void setup() {
   //delay(2000);
 
   lv_init();
+  lv_png_init();
   // alloc draw buffers used by LVGL from PSRAM
   lv_color_t *buf1 =
       (lv_color_t *)heap_caps_malloc(EXAMPLE_LCD_H_RES * EXAMPLE_LCD_V_RES * sizeof(lv_color_t), MALLOC_CAP_SPIRAM);
@@ -253,9 +260,7 @@ void setup() {
 
   // Touchscreen interrupt pin
   pinMode(TP_INT_PIN, INPUT_PULLUP);
-  attachInterrupt(
-      TP_INT_PIN, interacted, FALLING);
-
+  attachInterrupt(TP_INT_PIN, interacted, FALLING);
 
   ui_init();
   xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
@@ -380,8 +385,8 @@ void SD_init(void) {
   uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
   Serial.printf("SD Card Size: %lluMB\n", cardSize);
 
-  File file = SD_MMC.open("/settings.txt");
-  size_t len = file.size();
+  File * file = SD_MMC.open("/settings.txt");
+  size_t len = file->size();
   size_t flen = len;
   uint8_t coords[512];
 
@@ -390,18 +395,39 @@ void SD_init(void) {
     if (toRead > 512) {
       toRead = 512;
     }
-    file.read(coords, toRead);
+    file->read(coords, toRead);
     len -= toRead;
   }
 
-  Serial.print("settings.txt entries:\nCoordinates = ");
-  Serial.println((char *) coords);
-  /*
-  for (i = 0; i < size; i++) {
-    Serial.println( imgBuff[i] );
-  }*/
+  file->close();
+  delete file;
 
-  file.close();
+  bool latitude = true;
+
+  for (int i = 0; i < flen; i++) {
+
+    char c = coords[i];
+
+    if (c == ',') {
+      latitude = false;
+      continue;
+    } else if (c < 44 || c > 57) {
+      break;
+    }
+
+
+    if (latitude) {
+      location.lat += c;
+    } else {
+      location.lon += c;
+    }
+
+  }
+  Serial.print("settings.txt entries:\nCoordinates = ");
+  Serial.print(location.lat.c_str());
+  Serial.print(", ");
+  Serial.println(location.lon.c_str());
+
 }
 
 void interacted() {
@@ -505,10 +531,10 @@ void wifi_task(void *param) {
       time_millis = millis();
     }
 
-    /*
+
     if (millis() - weather_millis > 1200000 || weather_millis == 0) {
-      loc = location.getGeoFromWiFi();
-      String weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + String(loc.lat) + "&lon=" + String(loc.lon) + "&appid=" + String(WEATHER_API_KEY) + "&units=imperial";
+      //loc = location.getGeoFromWiFi();
+      std::string weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + location.lat + "&lon=" + location.lon + "&appid=" + std::string(WEATHER_API_KEY) + "&units=imperial";
       Serial.println(weather_url.c_str());
       http_client.begin(weather_url.c_str());
       int http_code = http_client.GET();
@@ -544,7 +570,7 @@ void wifi_task(void *param) {
 
       weather_millis = millis();
     }
-    */
+
 
     delay(100);
 
