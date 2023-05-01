@@ -16,6 +16,7 @@ static void slider_event_cb(lv_event_t * e)
 
 lv_obj_t * settings_init(lv_obj_t * parent) {
   lv_obj_t * settings_content = new_ui_flex_container(parent, LV_ALIGN_CENTER, LV_FLEX_FLOW_COLUMN, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_SIZE_CONTENT, LV_SIZE_CONTENT, 0, 0);
+  lv_obj_set_scroll_dir(settings_content, LV_DIR_VER);
 
   lv_obj_t * settings_label = new_ui_label(settings_content, &sf_bold_30, "Settings", LV_ALIGN_CENTER, LV_SIZE_CONTENT, 0, 0);
 

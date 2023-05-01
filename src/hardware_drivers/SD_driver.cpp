@@ -9,9 +9,6 @@ void * SD_open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
 
   File file;
 
-  Serial.print("Opening ");
-  Serial.println(path);
-
   if (mode == LV_FS_MODE_RD) {
     return SD_MMC.open(path, "r");
   } else if (mode == LV_FS_MODE_WR) {
@@ -27,8 +24,6 @@ void * SD_open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
 
 lv_fs_res_t SD_close_file(lv_fs_drv_t * drv, void * fp) {
   lv_fs_res_t res = LV_FS_RES_OK;
-
-  Serial.println("Closing file.");
 
   ((File *) (fp))->close();
 

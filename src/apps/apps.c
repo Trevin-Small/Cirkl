@@ -72,6 +72,22 @@ void open_app_event_cb(lv_event_t * e) {
 
   // Slide to the app screen tile
   lv_obj_set_tile(System.main_tile_view, System.app_screen_tile, LV_ANIM_ON);
+
+  System.app_is_open = true;
+}
+
+void open_gallery_event_cb(lv_event_t * e) {
+  // Get the app_init function pointer passed to open_app
+  lv_obj_t * (*app_init_func)(lv_obj_t *) = lv_event_get_user_data(e);
+
+  // Slide to the app screen tile
+  lv_obj_set_tile(System.main_tile_view, System.app_screen_tile, LV_ANIM_OFF);
+
+  // Call the initialization function of the app
+  System.app_content = app_init_func(System.app_screen_tile);
+
+  lv_obj_set_parent(x_out_btn.bg, lv_layer_top());
+
   System.app_is_open = true;
 }
 

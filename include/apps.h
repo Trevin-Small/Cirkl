@@ -10,6 +10,7 @@ void close_app_event_cb(lv_event_t * e);
 
 
 //---------------------- APP SPECIFIC FUNCTIONS -----------------------//
+void open_gallery_event_cb(lv_event_t * e);
 lv_obj_t * gallery_init(lv_obj_t * parent);
 lv_obj_t * calendar_init(lv_obj_t * parent);
 lv_obj_t * settings_init(lv_obj_t * parent);

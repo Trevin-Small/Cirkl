@@ -6,6 +6,8 @@
 lv_obj_t * gallery_init(lv_obj_t * parent) {
 
   lv_obj_t * gallery_content = new_ui_flex_container(parent, LV_ALIGN_CENTER, LV_FLEX_FLOW_COLUMN, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_START, LV_SIZE_CONTENT, LV_SIZE_CONTENT, 0, 0);
+  lv_obj_add_flag(gallery_content, LV_OBJ_FLAG_EVENT_BUBBLE);
+  lv_obj_clear_flag(gallery_content, LV_OBJ_FLAG_SCROLLABLE);
 
   lv_obj_t * img = lv_img_create(gallery_content);
   lv_img_set_src(img, "S:/test.bin");
