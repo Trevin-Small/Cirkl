@@ -122,6 +122,10 @@ void TRGB::lcd_data(const uint8_t *data, int len) {
   } while (len--);
 }
 
+void interacted() {
+  System.last_interact_time = millis();
+}
+
 /*
  * -----------------------------------------------------------------------------
  * TRGB Public members
@@ -130,9 +134,7 @@ void TRGB::lcd_data(const uint8_t *data, int len) {
 
 TRGB::TRGB(){ return; }
 
-void TRGB::init(system_t * sys) {
-  System = sys;
-
+void TRGB::init() {
   static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
   static lv_disp_drv_t disp_drv;      // lvgl display driver
   static lv_indev_drv_t indev_drv;    // lvgl touch panel driver
@@ -148,7 +150,7 @@ void TRGB::init(system_t * sys) {
   xl.pinMode8(0, pin, OUTPUT);
   xl.digitalWrite(PWR_EN_PIN, 1);
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System->brightness);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
   SD_init();
 
   xl.digitalWrite(TP_RES_PIN, 0);
@@ -241,7 +243,7 @@ void TRGB::init(system_t * sys) {
   disp_drv.flush_cb = example_lvgl_flush_cb;
   disp_drv.draw_buf = &disp_buf;
   disp_drv.user_data = panel_handle;
-  System->display = lv_disp_drv_register(&disp_drv);
+  System.display = lv_disp_drv_register(&disp_drv);
 
   // Register touch panel driver to LVGL
   lv_indev_drv_init(&indev_drv);
@@ -341,10 +343,10 @@ void TRGB::SD_init() {
 
   setCoordinates(latitude, longitude);
 
-  System->theme_main_color = lv_color_hex(colors[0]);
-  System->font_main_color = lv_color_hex(colors[1]);
-  System->font_accent_color = lv_color_hex(colors[2]);
-  System->theme_accent_color = lv_color_hex(colors[3]);
+  System.theme_main_color = lv_color_hex(colors[0]);
+  System.font_main_color = lv_color_hex(colors[1]);
+  System.font_accent_color = lv_color_hex(colors[2]);
+  System.theme_accent_color = lv_color_hex(colors[3]);
 
 
   Serial.print("settings.txt entries:\nCoordinates = ");
@@ -354,40 +356,36 @@ void TRGB::SD_init() {
 
 }
 
-void TRGB::interacted() {
-  System->last_interact_time = millis();
-}
-
 void TRGB::sleep() {
 
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
   detachInterrupt(TP_INT_PIN);
-  System->is_asleep = true;
+  System.is_asleep = true;
 
-  if (System->app_list_tile == lv_tileview_get_tile_act(System->main_tile_view)) {
-    lv_obj_set_tile(System->main_tile_view, System->info_tile, LV_ANIM_OFF);
-    lv_refr_now(System->display);
+  if (System.app_list_tile == lv_tileview_get_tile_act(System.main_tile_view)) {
+    lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
+    lv_refr_now(System.display);
   }
 
   delay(500);
   attachInterrupt(TP_INT_PIN, NULL, CHANGE);
-  System->is_asleep = false;
+  System.is_asleep = false;
 
-  while (System->is_asleep) {
+  while (System.is_asleep) {
     delay(100);
   }
 
-  System->last_interact_time = millis();
+  System.last_interact_time = millis();
   detachInterrupt(TP_INT_PIN);
   attachInterrupt(TP_INT_PIN, NULL, FALLING);
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System->brightness);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
 
 }
 
-void TRGB::shutdown() {
+void TRGB::deep_sleep() {
 
-  System->is_asleep = true;
-  System->wifi_active = false;
+  System.is_asleep = true;
+  System.wifi_active = false;
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
   WiFi.disconnect();
   detachInterrupt(TP_INT_PIN);
@@ -417,4 +415,8 @@ std::string TRGB::getLatitude() {
 
 std::string TRGB::getLongitude() {
   return location.lon;
+}
+
+void shutdown() {
+  trgb.deep_sleep();
 }

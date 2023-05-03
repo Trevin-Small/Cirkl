@@ -44,7 +44,7 @@ typedef struct system {
 
 extern system_t System;
 
-void shutdown(void);
+void shutdown();
 
 #ifdef __cplusplus
 } /*extern "C"*/

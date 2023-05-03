@@ -101,17 +101,16 @@ private:
 	static esp_lcd_panel_handle_t register_tft();
 
 public:
-  system_t * System;
-
   TRGB();
-  void init(system_t * sys);
+  void init();
   void SD_init(); //could be static, but I guess it is too confusing.
-  void interacted();
   void sleep();
-  void shutdown();
+  void deep_sleep();
 
   void setCoordinates(std::string lat, std::string lon);
   std::string getLatitude();
   std::string getLongitude();
 
 };
+
+extern TRGB trgb;
