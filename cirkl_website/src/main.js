@@ -1,8 +1,25 @@
+import { initializeApp } from "firebase/app";
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyDvn53F6_u2YxB5KQJXRbn3XJ-EwfjoVUo",
+  authDomain: "cirkl-d3b3d.firebaseapp.com",
+  projectId: "cirkl-d3b3d",
+  storageBucket: "cirkl-d3b3d.appspot.com",
+  messagingSenderId: "791478699120",
+  appId: "1:791478699120:web:852c432fa603d42f9060b5",
+  measurementId: "G-5S303FP0SY"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+
 const MAX_CANVAS_SIZE = 1024;
 const MIN_CANVAS_SIZE = 240;
 const CANVAS_PX_SIZE = 480;
 
-export const Main = (() => {
+const Main = (() => {
 
   // Button Containers
   let edit = {};
@@ -12,7 +29,6 @@ export const Main = (() => {
   let croppedImg;
   let canvas;
   let ctx;
-  let canvasSize;
   let canvasDisplaySize;
   let img;
   let imgProperties = {
@@ -140,13 +156,6 @@ export const Main = (() => {
     element.click();
     document.body.removeChild(element);
 
-    /*
-
-    croppedImg.src = canvas.toDataURL();
-    croppedImg.style.width = croppedImg.style.height = canvasSize + "px";
-    croppedImg.style.display = "block";
-    canvas.style.display = "none";
-    */
   }
 
   function removeImage() {
@@ -245,3 +254,5 @@ export const Main = (() => {
   };
 
 })();
+
+export function init() { Main.init(); }

@@ -5,12 +5,12 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="output.css" type="text/css" />
-  <script defer src="main.js"></script>
+  <script src="main.js" id="cirklScript"></script>
   <title>Cirkl</title>
 </head>
-<body class="bg-gray-300 w-full h-full fixed flex flex-col justify-start items-center">
+<body class="bg-gray-400 w-full h-full fixed flex flex-col justify-start items-center">
 
-  <div class="bg-blue-600 w-full h-auto py-4 px-8 flex flex-row justify-center align-middle">
+  <div class="bg-blue-600 w-full h-auto py-4 px-8 flex flex-row justify-center align-middle border-b-4 border-black">
     <h1 class="text-white font-sans text-3xl">Cirkl</h1>
   </div>
   <div id="edit-container" class="flex flex-row justify-center items-center align-middle" style="visibility:hidden;">
@@ -19,10 +19,14 @@
 
   </div>
 
-  <div id="main-container" class="w-full h-full mx-8 flex flex-col justify-center align-middle items-center">
-    <div class="w-auto h-auto relative border-8 rounded-full border-white p-0 my-4 overflow-hidden">
-      <img id="cropped-img" src="" style="display:none;">
-      <canvas id="photo-canvas" width="480" height="480" class="bg-black" style="width:480px; height:480px;"></canvas>
+  <div id="main-container" class="w-full h-full mx-8 flex flex-col justify-start align-middle items-center">
+    <div class="rounded-full border-2 border-gray-600 p-0 mb-4">
+
+      <div class="w-auto h-auto relative rounded-full border-white p-0 overflow-hidden" style="border-width:12px;">
+        <img id="cropped-img" src="" style="display:none;">
+        <canvas id="photo-canvas" width="480" height="480" class="bg-black" style="width:480px; height:480px;"></canvas>
+      </div>
+
     </div>
 
     <div id="upload-container" class="flex flex-col justify-start items-center">
@@ -46,5 +50,9 @@
       <button id="down" class="custom-button" >↓</button>
     </div>
   </div>
+
+  <script type="text/javascript">
+    cirkl.init();
+  </script>
 </body>
 </html>

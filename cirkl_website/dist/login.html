@@ -5,10 +5,10 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="output.css" type="text/css" />
-  <script defer src="main.js"></script>
+  <script src="main.js"></script>
   <title>Login</title>
 </head>
-<body class="bg-gray-300 w-full h-full fixed flex flex-col justify-start items-center">
+<body class="bg-gray-400 w-full h-full fixed flex flex-col justify-start items-center">
   
   <div class="bg-blue-600 w-full h-auto py-4 px-8 flex flex-row justify-center align-middle border-b-4 border-black">
     <h1 class="text-white font-sans text-3xl">Cirkl</h1>
@@ -31,10 +31,9 @@
                     onclick="this.classList.toggle('eye-slashed');let pass=document.getElementById('pass');if(pass.type==='password'){pass.type='text'}else{pass.type='password'};">
             </div>
             <button class="btn submit-auth my-5" type="submit" id="submit-login"
-                onclick="communityCrag.signIn();">Login</button>
+                onclick="cirkl.signIn();">Login</button>
         </form>
     </div>
   </div>
-
 </body>
 </html>
