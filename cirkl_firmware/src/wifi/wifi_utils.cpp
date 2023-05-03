@@ -1,6 +1,7 @@
-#include "secrets.h"
 #include "ui.h"
-#include "TRGB.h"
+#include "system.h"
+#include "location.h"
+#include "secrets.h"
 #include "wifi_utils.h"
 
 #include "WiFi.h"
@@ -107,7 +108,7 @@ void wifi_task(void *param) {
 
     if (millis() - weather_millis > 1200000 || weather_millis == 0) {
       //loc = location.getGeoFromWiFi();
-      std::string weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + trgb.getLatitude() + "&lon=" + trgb.getLongitude() + "&appid=" + std::string(WEATHER_API_KEY) + "&units=imperial";
+      std::string weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + location.lat + "&lon=" + location.lon + "&appid=" + std::string(WEATHER_API_KEY) + "&units=imperial";
       Serial.println(weather_url.c_str());
       http_client.begin(weather_url.c_str());
       int http_code = http_client.GET();

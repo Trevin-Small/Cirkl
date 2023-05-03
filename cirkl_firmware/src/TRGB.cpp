@@ -1,21 +1,23 @@
 // Local Includes
 #include "TRGB.h"
-#include "./hardware_drivers/XL9535_driver.h"
-#include "./hardware_drivers/SD_driver.h"
 #include "system.h"
 #include "ui.h"
+#include "location.h"
 #include "pin_config.h"
+#include "./hardware_drivers/XL9535_driver.h"
+#include "./hardware_drivers/SD_driver.h"
 
-#include <string>
-#include "lvgl.h"
-#include "TouchLib.h"
+
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 
 // Library Includes
+#include <string>
 #include <Arduino.h>
+#include "lvgl.h"
+#include "TouchLib.h"
 #include "SD_MMC.h"
 #include "Wire.h"
 #include "SPI.h"
@@ -300,6 +302,12 @@ void TRGB::SD_init() {
     Serial.println("UNKNOWN");
 
   File * file = SD_MMC.open("/settings.txt");
+
+  if (file == NULL) {
+    Serial.println("Could not read settings.txt.");
+    return;
+  }
+
   size_t len = file->size();
   size_t flen = len;
   uint8_t coords[512];
@@ -341,13 +349,15 @@ void TRGB::SD_init() {
 
   }
 
-  setCoordinates(latitude, longitude);
+  location.lat = latitude;
+  location.lon = longitude;
 
+  /*
   System.theme_main_color = lv_color_hex(colors[0]);
   System.font_main_color = lv_color_hex(colors[1]);
   System.font_accent_color = lv_color_hex(colors[2]);
   System.theme_accent_color = lv_color_hex(colors[3]);
-
+  */
 
   Serial.print("settings.txt entries:\nCoordinates = ");
   Serial.print(location.lat.c_str());
@@ -402,19 +412,6 @@ void TRGB::deep_sleep() {
   esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
   esp_deep_sleep_start();
 
-}
-
-void TRGB::setCoordinates(std::string lat, std::string lon) {
-  location.lat = lat;
-  location.lon = lon;
-}
-
-std::string TRGB::getLatitude() {
-  return location.lat;
-}
-
-std::string TRGB::getLongitude() {
-  return location.lon;
 }
 
 void shutdown() {

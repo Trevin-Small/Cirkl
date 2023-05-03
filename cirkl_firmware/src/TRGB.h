@@ -27,11 +27,6 @@
 
 #include <SD_MMC.h>
 
-typedef struct location {
-  std::string lat;
-  std::string lon;
-} loc_t;
-
 typedef struct {
   uint8_t cmd;
   uint8_t data[16];
@@ -89,7 +84,6 @@ class TRGB {
 
 private:
   XL9535 xl;
-  loc_t location;
 
 	lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
 	lv_disp_drv_t disp_drv;      // contains callback functions
@@ -106,10 +100,6 @@ public:
   void SD_init(); //could be static, but I guess it is too confusing.
   void sleep();
   void deep_sleep();
-
-  void setCoordinates(std::string lat, std::string lon);
-  std::string getLatitude();
-  std::string getLongitude();
 
 };
 

@@ -1,11 +1,13 @@
 // Local Includes
-#include "TRGB.h"
 #include "system.h"
+#include "location.h"
 #include "ui.h"
-#include "wifi_utils.h"
+#include "TRGB.h"
+#include "./wifi/wifi_utils.h"
 
 system_t System;
 TRGB trgb;
+loc_t location;
 u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
 
 void wifi_task(void * param);
