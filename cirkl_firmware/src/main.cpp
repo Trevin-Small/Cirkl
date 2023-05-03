@@ -383,13 +383,11 @@ void SD_init(void) {
   else
     Serial.println("UNKNOWN");
 
-  uint64_t cardSize = SD_MMC.cardSize() / (1024 * 1024);
-  Serial.printf("SD Card Size: %lluMB\n", cardSize);
-
   File * file = SD_MMC.open("/settings.txt");
   size_t len = file->size();
   size_t flen = len;
   uint8_t coords[512];
+  int colors[4];
 
   while (len) {
     size_t toRead = len;
@@ -422,6 +420,11 @@ void SD_init(void) {
     } else {
       location.lon += c;
     }
+
+    System.theme_main_color = lv_color_hex(colors[0]);
+    System.font_main_color = lv_color_hex(colors[1]);
+    System.font_accent_color = lv_color_hex(colors[2]);
+    System.theme_accent_color = lv_color_hex(colors[3]);
 
   }
   Serial.print("settings.txt entries:\nCoordinates = ");

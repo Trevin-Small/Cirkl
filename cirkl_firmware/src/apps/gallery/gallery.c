@@ -12,9 +12,13 @@ unsigned long photo_swap_interval = SWAP_INTERVAL;
 lv_obj_t * img;
 lv_timer_t * photo_timer;
 
-void next_picture(lv_timer_t * timer) {
-
+void set_picture_num(int num) {
   char img_format_str[9];
+  sprintf(img_format_str, "S:/%d.png", num);
+  lv_img_set_src(img, img_format_str);
+}
+
+void next_picture(lv_timer_t * timer) {
 
   ++curr_img_num;
 
@@ -22,9 +26,7 @@ void next_picture(lv_timer_t * timer) {
     curr_img_num = 0;
   }
 
-  sprintf(img_format_str, "S:/%d.png", curr_img_num);
-
-  lv_img_set_src(img, img_format_str);
+  set_picture_num(curr_img_num);
 
 }
 
@@ -34,13 +36,14 @@ lv_obj_t * gallery_init(lv_obj_t * parent) {
   lv_obj_add_flag(gallery_content, LV_OBJ_FLAG_EVENT_BUBBLE);
   lv_obj_clear_flag(gallery_content, LV_OBJ_FLAG_SCROLLABLE);
 
-  curr_img_num = NUM_IMAGES;
+  curr_img_num = 0;
   num_images = NUM_IMAGES;
   photo_swap_interval = SWAP_INTERVAL;
 
   img = lv_img_create(gallery_content);
   lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
   lv_obj_add_flag(img, LV_OBJ_FLAG_EVENT_BUBBLE);
+  set_picture_num(curr_img_num);
 
   photo_timer = lv_timer_create(next_picture, photo_swap_interval, NULL);
 
