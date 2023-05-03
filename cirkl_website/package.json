@@ -1,0 +1,16 @@
+{
+  "name": "cirkl_website",
+  "version": "1.0.0",
+  "description": "",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tailwind": "npx tailwindcss -i ./src/input.css -o ./dist/output.css --watch",
+    "build": "npx webpack --config webpack.config.js --watch"
+  },
+  "author": "Trevin S.",
+  "license": "ISC",
+  "dependencies": {
+    "firebase": "^9.20.0"
+  }
+}

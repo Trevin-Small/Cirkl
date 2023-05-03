@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="output.css" type="text/css" />
+  <script defer src="main.js"></script>
+  <title>Login</title>
+</head>
+<body class="bg-gray-300 w-full h-full fixed flex flex-col justify-start items-center">
+  
+  <div class="bg-blue-600 w-full h-auto py-4 px-8 flex flex-row justify-center align-middle border-b-4 border-black">
+    <h1 class="text-white font-sans text-3xl">Cirkl</h1>
+  </div>
+
+  <div class="auth-container bg-blue-400">
+    <div class="contents">
+        <h3 class="text-2xl font-semibold">Login</h3>
+        <hr>
+        <div class="error-message" id="error-message" style="display:none;"></div>
+        <form class="auth-form" onsubmit="event.preventDefault();">
+            <div style="margin:0.3rem;"></div>
+            <b>Enter Your Email:</b>
+            <input class="text-input" type="text" id="email" name="email" placeholder="email@domain.com">
+            <div style="margin:0.5rem;"></div>
+            <b>Enter Your Password:</b>
+            <div class="password-input">
+                <input class="text-input" type="password" id="pass" name="pass" placeholder="Password">
+                <img class="password-eye" src="./assets/eye.svg" alt="view-password"
+                    onclick="this.classList.toggle('eye-slashed');let pass=document.getElementById('pass');if(pass.type==='password'){pass.type='text'}else{pass.type='password'};">
+            </div>
+            <button class="btn submit-auth my-5" type="submit" id="submit-login"
+                onclick="communityCrag.signIn();">Login</button>
+        </form>
+    </div>
+  </div>
+
+</body>
+</html>

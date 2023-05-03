@@ -10,7 +10,7 @@ lv_obj_t * gallery_init(lv_obj_t * parent) {
   lv_obj_clear_flag(gallery_content, LV_OBJ_FLAG_SCROLLABLE);
 
   lv_obj_t * img = lv_img_create(gallery_content);
-  lv_img_set_src(img, "S:/test.bin");
+  lv_img_set_src(img, "S:/cute.png");
   lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
   lv_obj_add_flag(img, LV_OBJ_FLAG_EVENT_BUBBLE);
 

@@ -2,3 +2,5 @@
 .vscode
 **/.DS_Store
 src/secrets.h
+node_modules
+cirkl_device/src/secrets.h

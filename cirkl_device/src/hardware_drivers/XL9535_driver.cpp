@@ -25,10 +25,7 @@ void XL9535::begin(bool A0, bool A1, bool A2, TwoWire *wire) {
   _wire = wire;
   is_found = true;
   _wire->beginTransmission(_address);
-  if (!_wire->endTransmission()) {
-    Serial.println("Found xl9535");
-  } else {
-    Serial.println("xl9535 not found");
+  if (_wire->endTransmission()) {
     is_found = false;
   }
 }
@@ -112,6 +109,6 @@ void XL9535::read_all_reg() {
   uint8_t data;
   for (uint8_t i = 0; i < 8; i++) {
     readRegister(i, &data, 1);
-    Serial.printf("0x%02x : 0x%02X \r\n", i, data);
+    //Serial.printf("0x%02x : 0x%02X \r\n", i, data);
   }
 }
