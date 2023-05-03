@@ -17,6 +17,7 @@
 
 #include "lvgl.h"				// LVGL library
 #include "pin_config.h"
+#include "system.h"
 #include <Arduino.h>
 
 #include "esp_lcd_panel_io.h"
@@ -30,7 +31,6 @@ typedef struct location {
   std::string lat;
   std::string lon;
 } loc_t;
-
 
 typedef struct {
   uint8_t cmd;
@@ -85,7 +85,7 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
 
 
 
-class TRGBSuppport {
+class TRGB {
 
 private:
 	XL9535 xl;
@@ -101,13 +101,17 @@ private:
 	static esp_lcd_panel_handle_t register_tft();
 
 public:
-	TRGBSuppport();
-  void setCoordinates(std::string lat, std::string lon);
-	void sleep();
-	void shutdown();
-	void init();
-	void SD_init(); //could be static, but I guess it is too confusing.
+  system_t * System;
 
-  void wifi_task();
+	TRGB();
+	void init(system_t * sys);
+	void SD_init(); //could be static, but I guess it is too confusing.
+  void interacted();
+  void sleep();
+	void shutdown();
+
+  void setCoordinates(std::string lat, std::string lon);
+  std::string getLatitude();
+  std::string getLongitude();
 
 };
