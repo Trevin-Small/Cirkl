@@ -88,7 +88,7 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
 class TRGB {
 
 private:
-	XL9535 xl;
+  XL9535 xl;
   loc_t location;
 
 	lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
@@ -103,12 +103,12 @@ private:
 public:
   system_t * System;
 
-	TRGB();
-	void init(system_t * sys);
-	void SD_init(); //could be static, but I guess it is too confusing.
+  TRGB();
+  void init(system_t * sys);
+  void SD_init(); //could be static, but I guess it is too confusing.
   void interacted();
   void sleep();
-	void shutdown();
+  void shutdown();
 
   void setCoordinates(std::string lat, std::string lon);
   std::string getLatitude();

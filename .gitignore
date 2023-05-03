@@ -1,6 +1,7 @@
 **/.DS_Store
 .pio
 .vscode
+.firebase
 node_modules
 cirkl_firmware/src/secrets.h
 cirkl_website/database.rules.json

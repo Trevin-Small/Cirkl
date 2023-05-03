@@ -183,7 +183,6 @@ void loop() {
   if (!System.is_asleep) {
     lv_timer_handler();
 
-
     if (millis() - System.last_check_millis > SYS_CHECK_INTERVAL) {
 
       System.last_check_millis = millis();
