@@ -22,18 +22,14 @@ At this time, the firmware of the device and the accompanying website are still 
 - User B's Cirkl pings, displaying a notification that it received a new message. User B can now view the image sent to their device.
 - The same process can happen in reverse with user B sending a message to user A's Cirkl.
 
-# Features already implemented:
-- Internet time and weather
-- Simple App extensibility (system handles app routing, open, & close), so apps are simple to develop
-
-# Features to be implemented:
-- SD Card support (offline message storage, device settings, etc)
+# Idea List (Features that may be implemented eventaully):
 - Settings app to modify device color scheme and other configurations
-- Support sharing photos, text, and drawings
-- "Gallery" mode - flip through x amount of most recent messages
-- Fetch and display your reminders from Google Calendar
+- Synchronization with Google Calendar
+- Ambient light brightness adjustment
+- Time-synced color theme
 
 # What's it built with?
-- LilyGO T-RGB board and touch-screen display
+- LilyGO T-RGB board and round touch-screen display
 - LVGL
+- OpenWeather API
 - CAD & 3D Printing
