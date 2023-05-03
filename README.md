@@ -23,7 +23,6 @@ At this time, the firmware of the device and the accompanying website are still 
 - The same process can happen in reverse with user B sending a message to user A's Cirkl.
 
 # Idea List (Features that may be implemented eventaully):
-- Settings app to modify device color scheme and other configurations
 - Synchronization with Google Calendar
 - Ambient light brightness adjustment
 - Time-synced color theme
