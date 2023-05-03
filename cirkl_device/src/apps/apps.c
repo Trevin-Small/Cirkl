@@ -92,6 +92,11 @@ void open_gallery_event_cb(lv_event_t * e) {
 }
 
 void close_app_event_cb(lv_event_t * e) {
+
+    if (System.photo_timer != NULL) {
+      lv_timer_del(System.photo_timer);
+    }
+
     lv_obj_set_parent(x_out_btn.bg, System.app_screen_tile);
     lv_obj_set_tile(System.main_tile_view, System.app_list_tile, LV_ANIM_ON);
     System.app_is_open = false;

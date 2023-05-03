@@ -2,6 +2,7 @@
 
 #define SYS_CHECK_INTERVAL    100
 #define SYS_SLEEP_DELAY    120000
+#define SYS_PHOTO_INTERVAL  10000
 
 #define BRIGHTNESS_MAX        254
 #define BRIGHTNESS_MIN         50
@@ -19,6 +20,7 @@ typedef struct system {
     unsigned long last_interact_time;
     unsigned long last_check_millis;
     unsigned long sleep_delay;
+    unsigned long photo_interval;
     bool is_asleep;
     bool wifi_active;
     bool app_is_open;
@@ -32,6 +34,7 @@ typedef struct system {
     lv_obj_t * app_content;
     lv_coord_t app_tile_coord_x;
     lv_coord_t app_tile_coord_y;
+    lv_timer_t * photo_timer;
 
     lv_color_t theme_main_color;
     lv_color_t theme_accent_color;

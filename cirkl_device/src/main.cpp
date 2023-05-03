@@ -125,6 +125,7 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
 void setup() {
   System.sleep_delay = SYS_SLEEP_DELAY;
   System.brightness = BRIGHTNESS_DEFAULT;
+  System.photo_interval = SYS_PHOTO_INTERVAL;
   System.is_asleep = false;
   System.wifi_active = true;
 

@@ -528,6 +528,10 @@ video {
   position: relative;
 }
 
+.right-0 {
+  right: 0px;
+}
+
 .mx-8 {
   margin-left: 2rem;
   margin-right: 2rem;
@@ -593,6 +597,14 @@ video {
 
 .justify-center {
   justify-content: center;
+}
+
+.justify-self-end {
+  justify-self: end;
+}
+
+.justify-self-center {
+  justify-self: center;
 }
 
 .overflow-hidden {
