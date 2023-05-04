@@ -38,16 +38,17 @@ void read_coordniates() {
     if (c == ',') {
       isLat = false;
       continue;
-    } else if (c < 44 || c > 57) {
+    } else if (45 <= c && c <= 57) {
+      if (isLat) {
+        latitude += c;
+      } else {
+        longitude += c;
+      }
+    } else if (c != ',' && c != ' ' && c != '\n' && c != EOF) {
       Serial.println("In \'coordinates.txt\': Invalid coordinates!");
+      Serial.print("Character: ");
+      Serial.println(c);
       return;
-    }
-
-
-    if (isLat) {
-      latitude += c;
-    } else {
-      longitude += c;
     }
 
   }
@@ -79,7 +80,7 @@ void read_color_palette() {
   delete file;
 
   int color_num = 0;
-  uint32_t colors[4];
+  uint32_t colors[4] = {0};
   std::string color_builder = "";
 
   std::stringstream ss;
@@ -95,8 +96,7 @@ void read_color_palette() {
       Serial.print(color_builder.c_str());
       Serial.print(" ");
 
-      ss << std::hex << color_builder;
-      ss >> colors[color_num];
+      colors[color_num] = stoi(color_builder.substr(2), 0, 16);
 
       color_num++;
       color_builder = "";
@@ -113,6 +113,10 @@ void read_color_palette() {
   }
 
   Serial.println();
+
+  for (int i = 0; i < 4; i++) {
+    Serial.println(colors[i]);
+  }
 
   System.color_palette = true;
   System.theme_main_color = lv_color_hex(colors[0]);

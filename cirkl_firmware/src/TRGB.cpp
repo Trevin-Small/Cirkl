@@ -1,7 +1,6 @@
 // Local Includes
 #include "TRGB.h"
 #include "system.h"
-#include "location.h"
 #include "pin_config.h"
 #include "./hardware_drivers/XL9535_driver.h"
 #include "./system_utils/lv_fs_cb.h"

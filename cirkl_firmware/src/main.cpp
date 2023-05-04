@@ -28,7 +28,7 @@ void setup() {
   // Get UI color palette from SD card
   read_color_palette();
 
-  // Initialize display, touch panel, file system, and LVGL
+  // Initialize LVGL, display, touch panel, and file system drivers
   trgb.lvgl_init();
 
   // Start the LVGL User Interface
