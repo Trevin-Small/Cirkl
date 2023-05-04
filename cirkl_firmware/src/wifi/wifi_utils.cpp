@@ -106,7 +106,7 @@ void wifi_task(void *param) {
     }
 
 
-    if (millis() - weather_millis > 1200000 || weather_millis == 0) {
+    if (millis() - weather_millis > WEATHER_UPDATE_INTERVAL || weather_millis == 0) {
       //loc = location.getGeoFromWiFi();
       std::string weather_url = "https://api.openweathermap.org/data/2.5/weather?lat=" + location.lat + "&lon=" + location.lon + "&appid=" + std::string(WEATHER_API_KEY) + "&units=imperial";
       Serial.println(weather_url.c_str());

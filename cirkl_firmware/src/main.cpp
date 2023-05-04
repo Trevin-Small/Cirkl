@@ -13,9 +13,9 @@ u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
 void wifi_task(void * param);
 
 void setup() {
-  System.sleep_delay = SYS_SLEEP_DELAY;
+  System.sleep_after_time = SLEEP_AFTER_TIME;
   System.brightness = BRIGHTNESS_DEFAULT;
-  System.photo_interval = SYS_PHOTO_INTERVAL;
+  System.gallery_update_interval = GALLERY_UPDATE_INTERVAL;
   System.is_asleep = false;
   System.wifi_active = true;
 
@@ -31,7 +31,7 @@ void loop() {
   if (!System.is_asleep) {
     lv_timer_handler();
 
-    if (millis() - System.last_check_millis > SYS_CHECK_INTERVAL) {
+    if (millis() - System.last_check_millis > SYS_UPDATE_INTERVAL) {
 
       System.last_check_millis = millis();
 
@@ -40,7 +40,7 @@ void loop() {
         current_brightness = System.brightness;
       }
 
-      if (millis() - System.last_interact_time >= System.sleep_delay) {
+      if (millis() - System.last_interact_time >= System.sleep_after_time) {
         trgb.sleep();
       }
 

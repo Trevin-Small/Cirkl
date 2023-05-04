@@ -7,8 +7,6 @@
 int curr_img_num = 0;
 int num_images = NUM_IMAGES;
 
-unsigned long photo_swap_interval = SWAP_INTERVAL;
-
 lv_obj_t * img;
 lv_timer_t * photo_timer;
 
@@ -38,14 +36,13 @@ lv_obj_t * gallery_init(lv_obj_t * parent) {
 
   curr_img_num = 0;
   num_images = NUM_IMAGES;
-  photo_swap_interval = SWAP_INTERVAL;
 
   img = lv_img_create(gallery_content);
   lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
   lv_obj_add_flag(img, LV_OBJ_FLAG_EVENT_BUBBLE);
   set_picture_num(curr_img_num);
 
-  photo_timer = lv_timer_create(next_picture, photo_swap_interval, NULL);
+  photo_timer = lv_timer_create(next_picture, GALLERY_UPDATE_INTERVAL, NULL);
 
   return gallery_content;
 }

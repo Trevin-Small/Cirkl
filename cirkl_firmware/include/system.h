@@ -1,13 +1,14 @@
 #pragma once
 
-#define SYS_CHECK_INTERVAL    100
-#define SYS_SLEEP_DELAY    120000
-#define SYS_PHOTO_INTERVAL  10000
+#define SLEEP_AFTER_TIME         120000
+#define SYS_UPDATE_INTERVAL         100
+#define GALLERY_UPDATE_INTERVAL   10000
+#define WEATHER_UPDATE_INTERVAL 1200000
 
-#define BRIGHTNESS_MAX        254
-#define BRIGHTNESS_MIN         50
-#define BRIGHTNESS_DEFAULT    200
-#define BRIGHTNESS_OFF          0
+#define BRIGHTNESS_MAX              254
+#define BRIGHTNESS_MIN               50
+#define BRIGHTNESS_DEFAULT          200
+#define BRIGHTNESS_OFF                0
 
 #ifdef __cplusplus
 extern "C" {
@@ -19,8 +20,8 @@ typedef struct system {
     int32_t brightness;
     unsigned long last_interact_time;
     unsigned long last_check_millis;
-    unsigned long sleep_delay;
-    unsigned long photo_interval;
+    unsigned long sleep_after_time;
+    unsigned long gallery_update_interval;
     bool is_asleep;
     bool wifi_active;
     bool app_is_open;

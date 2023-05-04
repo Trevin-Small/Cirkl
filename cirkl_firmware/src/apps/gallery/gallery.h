@@ -1,7 +1,6 @@
 #include "lvgl.h"
 
 #define NUM_IMAGES       3
-#define SWAP_INTERVAL 5000
 
 typedef struct gallery {
 
