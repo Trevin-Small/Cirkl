@@ -37,6 +37,7 @@ typedef struct system {
     lv_coord_t app_tile_coord_y;
     lv_timer_t * photo_timer;
 
+    bool color_palette;
     lv_color_t theme_main_color;
     lv_color_t theme_accent_color;
     lv_color_t font_main_color;

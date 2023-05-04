@@ -15,7 +15,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-const MAX_CANVAS_SIZE = 1024;
+const MAX_CANVAS_SIZE = 800;
 const MIN_CANVAS_SIZE = 240;
 const CANVAS_PX_SIZE = 480;
 
@@ -87,7 +87,7 @@ const Main = (() => {
 
     let minDimension = containerWidth < containerHeight ? containerWidth : containerHeight;
 
-    let canvasSize = Math.max(Math.min(0.7 * minDimension, MAX_CANVAS_SIZE), MIN_CANVAS_SIZE);
+    let canvasSize = Math.max(Math.min(0.5 * minDimension, MAX_CANVAS_SIZE), MIN_CANVAS_SIZE);
     canvas.style.width = canvas.style.height = canvasSize + "px";
   }
 

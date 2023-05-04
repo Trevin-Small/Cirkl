@@ -12,7 +12,7 @@ lv_timer_t * photo_timer;
 
 void set_picture_num(int num) {
   char img_format_str[9];
-  sprintf(img_format_str, "S:/%d.png", num);
+  sprintf(img_format_str, "S:/images/%d.png", num);
   lv_img_set_src(img, img_format_str);
 }
 

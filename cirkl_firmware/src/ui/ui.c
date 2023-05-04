@@ -13,10 +13,14 @@
 //////////////////////////// MAIN ///////////////////////////
 
 void ui_init( void ) {
-    System.theme_main_color = lv_color_hex(0xF8F0E3);
-    System.font_main_color = lv_color_hex(0x000000);
-    System.font_accent_color = lv_color_hex(0x6cb6ff);
-    System.theme_accent_color = lv_color_hex(0x000000);
+
+    // If a color palette has not been set, fall back to default
+    if (!System.color_palette) {
+        System.theme_main_color = lv_color_hex(0xF8F0E3);
+        System.font_main_color = lv_color_hex(0x000000);
+        System.font_accent_color = lv_color_hex(0x6cb6ff);
+        System.theme_accent_color = lv_color_hex(0x000000);
+    }
 
 
     lv_disp_t *dispp = lv_disp_get_default();

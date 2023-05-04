@@ -5,8 +5,7 @@
 #include "location.h"
 #include "pin_config.h"
 #include "./hardware_drivers/XL9535_driver.h"
-#include "./hardware_drivers/SD_driver.h"
-
+#include "./system_utils/lv_fs_cb.h"
 
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
@@ -136,11 +135,24 @@ void interacted() {
 
 TRGB::TRGB(){ return; }
 
-void TRGB::init() {
-  static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
-  static lv_disp_drv_t disp_drv;      // lvgl display driver
-  static lv_indev_drv_t indev_drv;    // lvgl touch panel driver
-  static lv_fs_drv_t fs_drv;          // lvgl file system driver
+void TRGB::SD_init() {
+  // LVGL file system driver
+  static lv_fs_drv_t fs_drv;
+
+  // Register file system driver to LVGL
+  lv_fs_drv_init(&fs_drv);
+  fs_drv.letter = 'S';
+  fs_drv.open_cb = SD_open_file;
+  fs_drv.close_cb = SD_close_file;
+  fs_drv.read_cb = SD_read_file;
+  fs_drv.write_cb = SD_write_file;
+  fs_drv.seek_cb = SD_seek_file;
+  fs_drv.tell_cb = SD_tell_file;
+
+  //fs_drv.dir_open_cb = SD_dir_open;
+  //fs_drv.dir_read_cb = SD_dir_read;
+  //fs_drv.dir_close_cb = SD_dir_close;
+  lv_fs_drv_register(&fs_drv);
 
   // put your setup code here, to run once:
   Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
@@ -151,9 +163,30 @@ void TRGB::init() {
 
   xl.pinMode8(0, pin, OUTPUT);
   xl.digitalWrite(PWR_EN_PIN, 1);
-  pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
-  SD_init();
+  xl.digitalWrite(SD_CS_PIN, 1); // To use SDIO one-line mode, you need to pull the CS pin high
+  SD_MMC.setPins(SD_CLK_PIN, SD_CMD_PIN, SD_D0_PIN);
+
+  if (!SD_MMC.begin("/sdcard", true, true)) {
+    Serial.println("Card Mount Failed");
+    return;
+  }
+
+  uint8_t cardType = SD_MMC.cardType();
+  if (cardType == CARD_NONE) {
+    Serial.println("No SD card attached");
+    return;
+  }
+
+  Serial.print("SD card size: ");
+  Serial.println(SD_MMC.cardSize());
+
+}
+
+void TRGB::display_init() {
+
+  static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
+  static lv_disp_drv_t disp_drv;      // lvgl display driver
+  static lv_indev_drv_t indev_drv;    // lvgl touch panel driver
 
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(200);
@@ -253,117 +286,16 @@ void TRGB::init() {
   indev_drv.read_cb = lv_touchpad_read;
   lv_indev_drv_register(&indev_drv);
 
-  // Register file system driver to LVGL
-  lv_fs_drv_init(&fs_drv);
-  fs_drv.letter = 'S';
-  fs_drv.open_cb = SD_open_file;
-  fs_drv.close_cb = SD_close_file;
-  fs_drv.read_cb = SD_read_file;
-  fs_drv.write_cb = SD_write_file;
-  fs_drv.seek_cb = SD_seek_file;
-  fs_drv.tell_cb = SD_tell_file;
-
-  //fs_drv.dir_open_cb = SD_dir_open;
-  //fs_drv.dir_read_cb = SD_dir_read;
-  //fs_drv.dir_close_cb = SD_dir_close;
-  lv_fs_drv_register(&fs_drv);
-
   // Touchscreen interrupt pin
   pinMode(TP_INT_PIN, INPUT_PULLUP);
   attachInterrupt(TP_INT_PIN, interacted, FALLING);
 
+  // Backlight PWM pin
+  pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+
+  // Start LVGL User Interface
   ui_init();
-}
-
-void TRGB::SD_init() {
-
-  xl.digitalWrite(SD_CS_PIN, 1); // To use SDIO one-line mode, you need to pull the CS pin high
-  SD_MMC.setPins(SD_CLK_PIN, SD_CMD_PIN, SD_D0_PIN);
-  if (!SD_MMC.begin("/sdcard", true, true)) {
-    Serial.println("Card Mount Failed");
-    return;
-  }
-
-  uint8_t cardType = SD_MMC.cardType();
-  if (cardType == CARD_NONE) {
-    Serial.println("No SD card attached");
-    return;
-  }
-
-  Serial.print("SD Card Type: ");
-
-  if (cardType == CARD_MMC)
-    Serial.println("MMC");
-  else if (cardType == CARD_SD)
-    Serial.println("SDSC");
-  else if (cardType == CARD_SDHC)
-    Serial.println("SDHC");
-  else
-    Serial.println("UNKNOWN");
-
-  File * file = SD_MMC.open("/settings.txt");
-
-  if (file == NULL) {
-    Serial.println("Could not read settings.txt.");
-    return;
-  }
-
-  size_t len = file->size();
-  size_t flen = len;
-  uint8_t coords[512];
-  int colors[4];
-  std::string longitude;
-  std::string latitude;
-
-  while (len) {
-    size_t toRead = len;
-    if (toRead > 512) {
-      toRead = 512;
-    }
-    file->read(coords, toRead);
-    len -= toRead;
-  }
-
-  file->close();
-  delete file;
-
-  bool isLat = true;
-
-  for (int i = 0; i < flen; i++) {
-
-    char c = coords[i];
-
-    if (c == ',') {
-      isLat = false;
-      continue;
-    } else if (c < 44 || c > 57) {
-      break;
-    }
-
-
-    if (isLat) {
-      latitude += c;
-    } else {
-      longitude += c;
-    }
-
-  }
-
-  location.lat = latitude;
-  location.lon = longitude;
-
-  /*
-  System.theme_main_color = lv_color_hex(colors[0]);
-  System.font_main_color = lv_color_hex(colors[1]);
-  System.font_accent_color = lv_color_hex(colors[2]);
-  System.theme_accent_color = lv_color_hex(colors[3]);
-  */
-
-  Serial.print("settings.txt entries:\nCoordinates = ");
-  Serial.print(location.lat.c_str());
-  Serial.print(", ");
-  Serial.println(location.lon.c_str());
-
 }
 
 void TRGB::sleep() {

@@ -96,8 +96,8 @@ private:
 
 public:
   TRGB();
-  void init();
-  void SD_init(); //could be static, but I guess it is too confusing.
+  void SD_init();
+  void display_init();
   void sleep();
   void deep_sleep();
 

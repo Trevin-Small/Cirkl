@@ -7,3 +7,4 @@ cirkl_firmware/src/secrets.h
 cirkl_website/database.rules.json
 cirkl_website/.firebaserc
 cirkl_website/firebase.json
+cirkl_firmware/src/system_utils/secrets.h
