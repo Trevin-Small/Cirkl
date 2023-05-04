@@ -97,10 +97,14 @@ private:
 public:
   TRGB();
   void SD_init();
-  void display_init();
+  void lvgl_init();
   void sleep();
   void deep_sleep();
 
 };
 
 extern TRGB trgb;
+extern lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
+extern lv_disp_drv_t disp_drv;      // lvgl display driver
+extern lv_indev_drv_t indev_drv;    // lvgl touch panel driver
+extern lv_fs_drv_t fs_drv;          // lvgl file system driver

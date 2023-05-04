@@ -10,12 +10,6 @@ int num_images = NUM_IMAGES;
 lv_obj_t * img;
 lv_timer_t * photo_timer;
 
-void set_picture_num(int num) {
-  char img_format_str[9];
-  sprintf(img_format_str, "S:/images/%d.png", num);
-  lv_img_set_src(img, img_format_str);
-}
-
 void next_picture(lv_timer_t * timer) {
 
   ++curr_img_num;
@@ -24,7 +18,9 @@ void next_picture(lv_timer_t * timer) {
     curr_img_num = 0;
   }
 
-  set_picture_num(curr_img_num);
+  char img_format_str[20];
+  sprintf(img_format_str, "S:/images/%d.png", curr_img_num);
+  lv_img_set_src(img, img_format_str);
 
 }
 
@@ -40,7 +36,7 @@ lv_obj_t * gallery_init(lv_obj_t * parent) {
   img = lv_img_create(gallery_content);
   lv_obj_align(img, LV_ALIGN_CENTER, 0, 0);
   lv_obj_add_flag(img, LV_OBJ_FLAG_EVENT_BUBBLE);
-  set_picture_num(curr_img_num);
+  lv_img_set_src(img, "S:/images/0.png");
 
   photo_timer = lv_timer_create(next_picture, GALLERY_UPDATE_INTERVAL, NULL);
 

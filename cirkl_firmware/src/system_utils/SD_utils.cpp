@@ -15,7 +15,7 @@ void read_coordniates() {
 
   File * file = SD_MMC.open("/coordinates.txt");
 
-  if (file == NULL) {
+  if (!file) {
     Serial.println("Failed to open \'coordinates.txt\'");
     return;
   }
@@ -67,7 +67,7 @@ void read_color_palette() {
 
   File * file = SD_MMC.open("/color_palette.txt");
 
-  if (file == NULL) {
+  if (!file) {
     Serial.println("Failed to open \'color_palette.txt\'");
     return;
   }

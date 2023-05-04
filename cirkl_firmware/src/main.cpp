@@ -28,8 +28,11 @@ void setup() {
   // Get UI color palette from SD card
   read_color_palette();
 
-  // Initialize display drivers for LVGL
-  trgb.display_init();
+  // Initialize display, touch panel, file system, and LVGL
+  trgb.lvgl_init();
+
+  // Start the LVGL User Interface
+  ui_init();
 
   // Pin wifi funcitonality to core 0 (core 1 is default core)
   xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);

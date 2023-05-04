@@ -7,10 +7,14 @@
 #include "SD_MMC.h"
 #include "system.h"
 #include "lv_fs_cb.h"
+#include <Arduino.h>
 
-void * SD_open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
+void * open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
 
   File file;
+
+  Serial.print("Openening file: ");
+  Serial.println(path);
 
   if (mode == LV_FS_MODE_RD) {
     return SD_MMC.open(path, "r");
@@ -25,7 +29,7 @@ void * SD_open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
 
 }
 
-lv_fs_res_t SD_close_file(lv_fs_drv_t * drv, void * fp) {
+lv_fs_res_t close_file(lv_fs_drv_t * drv, void * fp) {
   lv_fs_res_t res = LV_FS_RES_OK;
 
   ((File *) (fp))->close();
@@ -35,7 +39,7 @@ lv_fs_res_t SD_close_file(lv_fs_drv_t * drv, void * fp) {
   return res;
 }
 
-lv_fs_res_t SD_read_file(_lv_fs_drv_t *drv, void * fp, void * buf, uint32_t btr, uint32_t * br) {
+lv_fs_res_t read_file(_lv_fs_drv_t *drv, void * fp, void * buf, uint32_t btr, uint32_t * br) {
 
   lv_fs_res_t res = LV_FS_RES_OK;
 
@@ -47,7 +51,7 @@ lv_fs_res_t SD_read_file(_lv_fs_drv_t *drv, void * fp, void * buf, uint32_t btr,
 
 }
 
-lv_fs_res_t SD_write_file(lv_fs_drv_t * drv, void * fp, const void * buf, uint32_t btw, uint32_t * bw) {
+lv_fs_res_t write_file(lv_fs_drv_t * drv, void * fp, const void * buf, uint32_t btw, uint32_t * bw) {
   lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));
@@ -57,7 +61,7 @@ lv_fs_res_t SD_write_file(lv_fs_drv_t * drv, void * fp, const void * buf, uint32
   return res;
 }
 
-lv_fs_res_t SD_seek_file(lv_fs_drv_t *drv, void *fp, uint32_t pos, lv_fs_whence_t whence) {
+lv_fs_res_t seek_file(lv_fs_drv_t *drv, void *fp, uint32_t pos, lv_fs_whence_t whence) {
   lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));
@@ -73,7 +77,7 @@ lv_fs_res_t SD_seek_file(lv_fs_drv_t *drv, void *fp, uint32_t pos, lv_fs_whence_
   return res;
 }
 
-lv_fs_res_t SD_tell_file(_lv_fs_drv_t *drv, void *fp, uint32_t *pos_p) {
+lv_fs_res_t tell_file(_lv_fs_drv_t *drv, void *fp, uint32_t *pos_p) {
   lv_fs_res_t res = LV_FS_RES_OK;
 
   File file = *((File *) (fp));

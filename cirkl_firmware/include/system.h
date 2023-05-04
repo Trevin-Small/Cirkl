@@ -10,6 +10,13 @@
 #define BRIGHTNESS_DEFAULT          200
 #define BRIGHTNESS_OFF                0
 
+#include "stdint.h"
+
+typedef struct {
+  uint16_t x;
+  uint16_t y;
+} touch_point_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

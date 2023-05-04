@@ -10,13 +10,6 @@
 #define APP_ICON_SIZE      96
 #define APP_GRID_SIZE     128
 
-#include "stdint.h"
-
-typedef struct {
-  uint16_t x;
-  uint16_t y;
-} touch_point_t;
-
 #ifdef __cplusplus
 extern "C" {
 #endif

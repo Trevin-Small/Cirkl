@@ -1,7 +1,6 @@
 // Local Includes
 #include "TRGB.h"
 #include "system.h"
-#include "ui.h"
 #include "location.h"
 #include "pin_config.h"
 #include "./hardware_drivers/XL9535_driver.h"
@@ -21,6 +20,11 @@
 #include "Wire.h"
 #include "SPI.h"
 #include "WiFi.h"
+
+lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
+lv_disp_drv_t disp_drv;      // lvgl display driver
+lv_indev_drv_t indev_drv;    // lvgl touch panel driver
+lv_fs_drv_t fs_drv;          // lvgl file system driver
 
 /*
  * -----------------------------------------------------------------------------
@@ -136,23 +140,6 @@ void interacted() {
 TRGB::TRGB(){ return; }
 
 void TRGB::SD_init() {
-  // LVGL file system driver
-  static lv_fs_drv_t fs_drv;
-
-  // Register file system driver to LVGL
-  lv_fs_drv_init(&fs_drv);
-  fs_drv.letter = 'S';
-  fs_drv.open_cb = SD_open_file;
-  fs_drv.close_cb = SD_close_file;
-  fs_drv.read_cb = SD_read_file;
-  fs_drv.write_cb = SD_write_file;
-  fs_drv.seek_cb = SD_seek_file;
-  fs_drv.tell_cb = SD_tell_file;
-
-  //fs_drv.dir_open_cb = SD_dir_open;
-  //fs_drv.dir_read_cb = SD_dir_read;
-  //fs_drv.dir_close_cb = SD_dir_close;
-  lv_fs_drv_register(&fs_drv);
 
   // put your setup code here, to run once:
   Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
@@ -182,11 +169,7 @@ void TRGB::SD_init() {
 
 }
 
-void TRGB::display_init() {
-
-  static lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
-  static lv_disp_drv_t disp_drv;      // lvgl display driver
-  static lv_indev_drv_t indev_drv;    // lvgl touch panel driver
+void TRGB::lvgl_init() {
 
   xl.digitalWrite(TP_RES_PIN, 0);
   delay(200);
@@ -286,6 +269,23 @@ void TRGB::display_init() {
   indev_drv.read_cb = lv_touchpad_read;
   lv_indev_drv_register(&indev_drv);
 
+  // Register file system driver to LVGL
+  lv_fs_drv_init(&fs_drv);
+  fs_drv.letter = 'S';
+  fs_drv.open_cb = open_file;
+  fs_drv.close_cb = close_file;
+  fs_drv.read_cb = read_file;
+  fs_drv.write_cb = write_file;
+  fs_drv.seek_cb = seek_file;
+  fs_drv.tell_cb = tell_file;
+
+  /*
+  fs_drv.dir_open_cb = SD_dir_open;
+  fs_drv.dir_read_cb = SD_dir_read;
+  fs_drv.dir_close_cb = SD_dir_close;
+  */
+  lv_fs_drv_register(&fs_drv);
+
   // Touchscreen interrupt pin
   pinMode(TP_INT_PIN, INPUT_PULLUP);
   attachInterrupt(TP_INT_PIN, interacted, FALLING);
@@ -294,8 +294,6 @@ void TRGB::display_init() {
   pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
 
-  // Start LVGL User Interface
-  ui_init();
 }
 
 void TRGB::sleep() {
