@@ -127,6 +127,7 @@ void TRGB::lcd_data(const uint8_t *data, int len) {
 }
 
 void interacted() {
+  System.is_asleep = false;
   System.last_interact_time = millis();
 }
 
@@ -297,26 +298,27 @@ void TRGB::lvgl_init() {
 
 void TRGB::sleep() {
 
+  System.is_asleep = true;
+  delay(100);
+
+  // Turn off display, disable "wakeup"
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
   detachInterrupt(TP_INT_PIN);
-  System.is_asleep = true;
 
   if (System.app_list_tile == lv_tileview_get_tile_act(System.main_tile_view)) {
     lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
     lv_refr_now(System.display);
   }
 
+  // Enable touch "wakeup" after 500 milliseconds
   delay(500);
-  attachInterrupt(TP_INT_PIN, NULL, CHANGE);
-  System.is_asleep = false;
+  attachInterrupt(TP_INT_PIN, interacted, FALLING);
 
   while (System.is_asleep) {
     delay(100);
   }
 
   System.last_interact_time = millis();
-  detachInterrupt(TP_INT_PIN);
-  attachInterrupt(TP_INT_PIN, NULL, FALLING);
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
 
 }

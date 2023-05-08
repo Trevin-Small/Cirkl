@@ -38,7 +38,7 @@ lv_obj_t * gallery_init(lv_obj_t * parent) {
   lv_obj_add_flag(img, LV_OBJ_FLAG_EVENT_BUBBLE);
   lv_img_set_src(img, "S:/images/0.png");
 
-  photo_timer = lv_timer_create(next_picture, GALLERY_UPDATE_INTERVAL, NULL);
+  //photo_timer = lv_timer_create(next_picture, GALLERY_UPDATE_INTERVAL, NULL);
 
   return gallery_content;
 }

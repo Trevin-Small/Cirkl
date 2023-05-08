@@ -1,6 +1,6 @@
 #pragma once
 
-#define SLEEP_AFTER_TIME         120000
+#define SLEEP_AFTER_TIME          20000
 #define SYS_UPDATE_INTERVAL         100
 #define GALLERY_UPDATE_INTERVAL   10000
 #define WEATHER_UPDATE_INTERVAL 1200000
