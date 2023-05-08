@@ -13,7 +13,7 @@ void * open_file(lv_fs_drv_t * drv, const char * path, lv_fs_mode_t mode) {
 
   File file;
 
-  Serial.print("Openening file: ");
+  Serial.print("Opening file: ");
   Serial.println(path);
 
   if (mode == LV_FS_MODE_RD) {

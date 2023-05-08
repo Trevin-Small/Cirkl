@@ -34,6 +34,9 @@ void setup() {
   // Start the LVGL User Interface
   ui_init();
 
+  // Update last interact time so device doesn't immediately sleep
+  System.last_interact_time = millis();
+
   // Pin wifi funcitonality to core 0 (core 1 is default core)
   xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
 }
@@ -52,6 +55,7 @@ void loop() {
 
       System.last_check_millis = millis();
 
+      // Update device brightness if a new value has been set
       if (System.brightness != current_brightness) {
         analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
         current_brightness = System.brightness;
