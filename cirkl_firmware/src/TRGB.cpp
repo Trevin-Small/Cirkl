@@ -139,11 +139,15 @@ void interacted() {
 
 TRGB::TRGB(){ return; }
 
+void TRGB::enable_backlight() {
+  pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+}
+
 void TRGB::SD_init() {
 
   // put your setup code here, to run once:
   Wire.begin(IIC_SDA_PIN, IIC_SCL_PIN, (uint32_t)400000);
-  Serial.begin(115200);
   xl.begin();
   uint8_t pin = (1 << PWR_EN_PIN) | (1 << LCD_CS_PIN) | (1 << TP_RES_PIN) | (1 << LCD_SDA_PIN) | (1 << LCD_CLK_PIN) |
                 (1 << LCD_RST_PIN) | (1 << SD_CS_PIN);
@@ -290,20 +294,17 @@ void TRGB::lvgl_init() {
   pinMode(TP_INT_PIN, INPUT_PULLUP);
   attachInterrupt(TP_INT_PIN, interacted, FALLING);
 
-  // Backlight PWM pin
-  pinMode(EXAMPLE_PIN_NUM_BK_LIGHT, OUTPUT);
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
-
 }
 
 void TRGB::sleep() {
 
+  // disable "wakeup" on touch
+  detachInterrupt(TP_INT_PIN);
   System.is_asleep = true;
   delay(100);
 
-  // Turn off display, disable "wakeup"
+  // Turn off display
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
-  detachInterrupt(TP_INT_PIN);
 
   if (System.app_list_tile == lv_tileview_get_tile_act(System.main_tile_view)) {
     lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
@@ -346,5 +347,8 @@ void TRGB::deep_sleep() {
 }
 
 void shutdown() {
-  trgb.deep_sleep();
+  //trgb.deep_sleep();
+
+  // deep_sleep crashes on wake, so call regular sleep until fixed.
+  trgb.sleep();
 }

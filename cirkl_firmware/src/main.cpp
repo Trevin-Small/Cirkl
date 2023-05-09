@@ -11,6 +11,8 @@ loc_t location;
 u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
 
 void setup() {
+  Serial.begin(115200);
+
   System.sleep_after_time = SLEEP_AFTER_TIME;
   System.brightness = BRIGHTNESS_DEFAULT;
   System.gallery_update_interval = GALLERY_UPDATE_INTERVAL;
@@ -18,6 +20,9 @@ void setup() {
   System.wifi_active = true;
   System.color_palette = false;
   location.is_known = false;
+
+  // Turn on the backlight of the LCD
+  trgb.enable_backlight();
 
   // Initialize SD card hardware
   trgb.SD_init();
@@ -39,6 +44,7 @@ void setup() {
 
   // Pin wifi funcitonality to core 0 (core 1 is default core)
   xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, NULL, 0);
+
 }
 
 void loop() {

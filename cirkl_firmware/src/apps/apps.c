@@ -83,6 +83,8 @@ void open_gallery_event_cb(lv_event_t * e) {
   // Slide to the app screen tile
   lv_obj_set_tile(System.main_tile_view, System.app_screen_tile, LV_ANIM_OFF);
 
+  //lv_timer_handler();
+
   // Call the initialization function of the app
   System.app_content = app_init_func(System.app_screen_tile);
 

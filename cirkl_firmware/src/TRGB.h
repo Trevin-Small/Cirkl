@@ -96,6 +96,7 @@ private:
 
 public:
   TRGB();
+  void enable_backlight();
   void SD_init();
   void lvgl_init();
   void sleep();
