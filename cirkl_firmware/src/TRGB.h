@@ -18,13 +18,13 @@
 #include "lvgl.h"				// LVGL library
 #include "pin_config.h"
 #include "system.h"
-#include <Arduino.h>
 
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 
+#include <Arduino.h>
 #include <SD_MMC.h>
 
 typedef struct {
@@ -90,6 +90,7 @@ private:
   } wifi_task_t;
 
   XL9535 xl;
+  TaskHandle_t wifi_task_handle;
 
 	lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
 	lv_disp_drv_t disp_drv;      // contains callback functions
@@ -98,16 +99,14 @@ private:
 	void lcd_cmd(const uint8_t cmd);
 	void lcd_data(const uint8_t *data, int len);
 	void lcd_send_data(uint8_t data);
-  static void wifi_task_func(void * task_params);
+  static void invoke_wifi_task(void * task_params);
 
 public:
-  TaskHandle_t wifi_task_handle;
-
   TRGB();
   void enable_backlight();
   void SD_init();
   void lvgl_init();
-  void wifi_task_init(void (* task_func)());
+  void wifi_task_init(void (* task_func)(), BaseType_t xCoreID);
   void sleep();
   void deep_sleep();
 

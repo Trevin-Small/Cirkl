@@ -33,17 +33,17 @@ void setup() {
   // Get UI color palette from SD card
   read_color_palette();
 
-  // Initialize LVGL, display, touch panel, and file system drivers
+  // Initialize LVGL drivers for display, touch panel, and file system
   trgb.lvgl_init();
 
-  // Start the LVGL User Interface
+  // Start user interface
   ui_init();
 
   // Update last interact time so device doesn't immediately sleep
   System.last_interact_time = millis();
 
-  // Begin the wifi task
-  trgb.wifi_task_init(wifi_task);
+  // Create task on core 0 (Core 1 is default core) to execute wifi functionality
+  trgb.wifi_task_init(wifi_task, 0);
 
 }
 

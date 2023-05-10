@@ -131,7 +131,7 @@ void TRGB::lcd_data(const uint8_t *data, int len) {
   } while (len--);
 }
 
-void TRGB::wifi_task_func(void * task_params) {
+void TRGB::invoke_wifi_task(void * task_params) {
   // Call the wifi task function
   ((wifi_task_t *) task_params)->wifi_task_func();
 }
@@ -306,10 +306,11 @@ void TRGB::lvgl_init() {
 
 }
 
-void TRGB::wifi_task_init(void (* task_func)()) {
+void TRGB::wifi_task_init(void (* task_func)(), BaseType_t xCoreID) {
   wifi_task_t w = {task_func};
   // Pin wifi funcitonality to core 0 (core 1 is default core)
-  xTaskCreatePinnedToCore(TRGB::wifi_task_func, "wifi_task", 1024 * 6, (void *) &w, 1, &wifi_task_handle, 0);
+  xTaskCreatePinnedToCore(TRGB::invoke_wifi_task, "wifi_task", 1024 * 6,
+                          (void *) &w, 1, &wifi_task_handle, 0);
 }
 
 void TRGB::sleep() {
