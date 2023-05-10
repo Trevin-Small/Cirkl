@@ -209,6 +209,9 @@ void TRGB::lvgl_init() {
       .pclk_gpio_num = EXAMPLE_PIN_NUM_PCLK,
       .data_gpio_nums =
           {
+              // RGB565 being driven in parallel
+
+              // 5 pins for red channel
               // EXAMPLE_PIN_NUM_DATA0,
               EXAMPLE_PIN_NUM_DATA13,
               EXAMPLE_PIN_NUM_DATA14,
@@ -216,6 +219,7 @@ void TRGB::lvgl_init() {
               EXAMPLE_PIN_NUM_DATA16,
               EXAMPLE_PIN_NUM_DATA17,
 
+              // 6 pins for green channel
               EXAMPLE_PIN_NUM_DATA6,
               EXAMPLE_PIN_NUM_DATA7,
               EXAMPLE_PIN_NUM_DATA8,
@@ -224,6 +228,7 @@ void TRGB::lvgl_init() {
               EXAMPLE_PIN_NUM_DATA11,
               // EXAMPLE_PIN_NUM_DATA12,
 
+              // 5 pins for blue channel
               EXAMPLE_PIN_NUM_DATA1,
               EXAMPLE_PIN_NUM_DATA2,
               EXAMPLE_PIN_NUM_DATA3,
@@ -300,12 +305,20 @@ void TRGB::sleep() {
 
   // disable "wakeup" on touch
   detachInterrupt(TP_INT_PIN);
-  System.is_asleep = true;
-  delay(100);
 
-  // Turn off display
+  // Mark device as asleep
+  System.is_asleep = true;
+  //delay(100);
+
+  // Turn off backlight
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
 
+  // Reset LCD
+  xl.digitalWrite(LCD_RST_PIN, 0);
+  delay(50);
+  xl.digitalWrite(LCD_RST_PIN, 1);
+
+  // If the app list is open, switch the active screen to the main home screen
   if (System.app_list_tile == lv_tileview_get_tile_act(System.main_tile_view)) {
     lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
     lv_refr_now(System.display);
@@ -315,40 +328,56 @@ void TRGB::sleep() {
   delay(500);
   attachInterrupt(TP_INT_PIN, interacted, FALLING);
 
+
+  // Block thread until device is awake
   while (System.is_asleep) {
     delay(100);
   }
 
+  // Update the interaction time
   System.last_interact_time = millis();
+
+  // Turn the backlight on
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
+
+  // Re-Initialize the LCD
+  tft_init();
 
 }
 
 void TRGB::deep_sleep() {
 
+  // End wifi task
+  if (wifi_task_handle) {
+    vTaskDelete(wifi_task_handle);
+  }
+
   System.is_asleep = true;
   System.wifi_active = false;
-  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
+
   WiFi.disconnect();
+
+  // Temporarily disable wakeup on touch
   detachInterrupt(TP_INT_PIN);
-  xl.pinMode8(0, 0xff, INPUT);
-  xl.pinMode8(1, 0xff, INPUT);
-  xl.read_all_reg();
+
+  // Turn off backlight
+  analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
 
   // If the SD card is initialized, it needs to be unmounted.
   if (SD_MMC.cardSize())
     SD_MMC.end();
 
-  delay(500);
+  // Delay temporarily to prevent waking up from the shutdown button touch
+  delay(1000);
 
+  // Enable deep sleep wakeup on touch
   esp_sleep_enable_ext0_wakeup((gpio_num_t)TP_INT_PIN, 0);
+
+  // Enter deep sleep mode
   esp_deep_sleep_start();
 
 }
 
 void shutdown() {
-  //trgb.deep_sleep();
-
-  // deep_sleep crashes on wake, so call regular sleep until fixed.
-  trgb.sleep();
+  trgb.deep_sleep();
 }

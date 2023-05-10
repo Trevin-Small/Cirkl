@@ -95,6 +95,8 @@ private:
 	static esp_lcd_panel_handle_t register_tft();
 
 public:
+  TaskHandle_t wifi_task_handle;
+
   TRGB();
   void enable_backlight();
   void SD_init();
