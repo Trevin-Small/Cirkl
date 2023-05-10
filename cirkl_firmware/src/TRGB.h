@@ -1,10 +1,9 @@
 #pragma once
 
-#include "./hardware_drivers/XL9535_driver.h"		// I/O extionsion via I2C
-
-#include "lvgl.h"				// LVGL library
+#include "lvgl.h"
 #include "pin_config.h"
 #include "system.h"
+#include "./hardware_drivers/XL9535_driver.h"		// I/O extionsion via I2C
 
 #include "esp_lcd_panel_io.h"
 #include "esp_lcd_panel_ops.h"
