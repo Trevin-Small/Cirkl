@@ -1,16 +1,3 @@
-/*
- * TRGB.h
- *
- *  Created on: 29.12.2022
- *      Author: ian (@Github "euphi")
- *
- *      Code is copied from official examples (https://github.com/Xinyuan-LilyGO/T-RGB/tree/main/example/factory).
- *      No logic changes, but restructured for easier use.
- *
- *      License: MIT
- *
- */
-
 #pragma once
 
 #include "./hardware_drivers/XL9535_driver.h"		// I/O extionsion via I2C
