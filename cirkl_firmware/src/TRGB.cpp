@@ -1,4 +1,3 @@
-// Local Includes
 #include "TRGB.h"
 #include "system.h"
 #include "pin_config.h"
@@ -10,7 +9,6 @@
 #include "esp_lcd_panel_rgb.h"
 #include "esp_lcd_panel_vendor.h"
 
-// Library Includes
 #include <string>
 #include <Arduino.h>
 #include "lvgl.h"
