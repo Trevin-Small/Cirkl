@@ -33,11 +33,6 @@ typedef struct {
   uint8_t databytes; // No of data in data; bit 7 = delay after set; 0xFF = end of cmds.
 } lcd_init_cmd_t;
 
-typedef struct wifi_task {
-  // Wifi task function callback
-  void (* wifi_task_func)();
-} wifi_task_t;
-
 DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0xFF, {0x77, 0x01, 0x00, 0x00, 0x10}, 0x05},
     {0xC0, {0x3b, 0x00}, 0x02},
@@ -88,6 +83,12 @@ DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
 class TRGB {
 
 private:
+
+  typedef struct wifi_task {
+    // Wifi task function callback
+    void (* wifi_task_func)();
+  } wifi_task_t;
+
   XL9535 xl;
 
 	lv_disp_draw_buf_t disp_buf; // contains internal graphic buffer(s) called draw buffer(s)
