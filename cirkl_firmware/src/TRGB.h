@@ -33,6 +33,11 @@ typedef struct {
   uint8_t databytes; // No of data in data; bit 7 = delay after set; 0xFF = end of cmds.
 } lcd_init_cmd_t;
 
+typedef struct wifi_task {
+  // Wifi task function callback
+  void (* wifi_task_func)();
+} wifi_task_t;
+
 DRAM_ATTR static const lcd_init_cmd_t st_init_cmds[] = {
     {0xFF, {0x77, 0x01, 0x00, 0x00, 0x10}, 0x05},
     {0xC0, {0x3b, 0x00}, 0x02},
@@ -92,7 +97,7 @@ private:
 	void lcd_cmd(const uint8_t cmd);
 	void lcd_data(const uint8_t *data, int len);
 	void lcd_send_data(uint8_t data);
-	static esp_lcd_panel_handle_t register_tft();
+  static void wifi_task_func(void * task_params);
 
 public:
   TaskHandle_t wifi_task_handle;
@@ -101,6 +106,7 @@ public:
   void enable_backlight();
   void SD_init();
   void lvgl_init();
+  void wifi_task_init(void (* task_func)());
   void sleep();
   void deep_sleep();
 

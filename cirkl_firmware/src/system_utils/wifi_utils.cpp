@@ -10,7 +10,7 @@
 #include <Arduino_JSON.h>
 
 // All WiFi tasks are handled here, including time, weather, and gallery updates
-void wifi_task(void *param) {
+void wifi_task() {
 
   WiFi.mode(WIFI_STA);
   delay(100);

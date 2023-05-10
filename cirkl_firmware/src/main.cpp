@@ -13,8 +13,6 @@ u_int8_t current_brightness = BRIGHTNESS_DEFAULT;
 void setup() {
   Serial.begin(115200);
 
-  Serial.println("Setup called.");
-
   System.sleep_after_time = SLEEP_AFTER_TIME;
   System.brightness = BRIGHTNESS_DEFAULT;
   System.gallery_update_interval = GALLERY_UPDATE_INTERVAL;
@@ -44,8 +42,8 @@ void setup() {
   // Update last interact time so device doesn't immediately sleep
   System.last_interact_time = millis();
 
-  // Pin wifi funcitonality to core 0 (core 1 is default core)
-  xTaskCreatePinnedToCore(wifi_task, "wifi_task", 1024 * 6, NULL, 1, &(trgb.wifi_task_handle), 0);
+  // Begin the wifi task
+  trgb.wifi_task_init(wifi_task);
 
 }
 

@@ -57,6 +57,11 @@ static void lv_touchpad_read(lv_indev_drv_t *indev_driver, lv_indev_data_t *data
   }
 }
 
+void interacted() {
+  System.is_asleep = false;
+  System.last_interact_time = millis();
+}
+
 /*
  * -----------------------------------------------------------------------------
  * TRGB Private members
@@ -126,9 +131,9 @@ void TRGB::lcd_data(const uint8_t *data, int len) {
   } while (len--);
 }
 
-void interacted() {
-  System.is_asleep = false;
-  System.last_interact_time = millis();
+void TRGB::wifi_task_func(void * task_params) {
+  // Call the wifi task function
+  ((wifi_task_t *) task_params)->wifi_task_func();
 }
 
 /*
@@ -301,6 +306,12 @@ void TRGB::lvgl_init() {
 
 }
 
+void TRGB::wifi_task_init(void (* task_func)()) {
+  wifi_task_t w = {task_func};
+  // Pin wifi funcitonality to core 0 (core 1 is default core)
+  xTaskCreatePinnedToCore(TRGB::wifi_task_func, "wifi_task", 1024 * 6, (void *) &w, 1, &wifi_task_handle, 0);
+}
+
 void TRGB::sleep() {
 
   // disable "wakeup" on touch
@@ -314,34 +325,39 @@ void TRGB::sleep() {
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, BRIGHTNESS_OFF);
 
   // Reset LCD
+  /*
   xl.digitalWrite(LCD_RST_PIN, 0);
   delay(50);
   xl.digitalWrite(LCD_RST_PIN, 1);
+  */
 
   // If the app list is open, switch the active screen to the main home screen
   if (System.app_list_tile == lv_tileview_get_tile_act(System.main_tile_view)) {
     lv_obj_set_tile(System.main_tile_view, System.info_tile, LV_ANIM_OFF);
-    lv_refr_now(System.display);
   }
+
+  // Clear the LCD (Hide all LVGL elements)
+  lv_obj_add_flag(System.active_screen, LV_OBJ_FLAG_HIDDEN);
+  lv_refr_now(System.display);
 
   // Enable touch "wakeup" after 500 milliseconds
   delay(500);
   attachInterrupt(TP_INT_PIN, interacted, FALLING);
-
 
   // Block thread until device is awake
   while (System.is_asleep) {
     delay(100);
   }
 
-  // Update the interaction time
-  System.last_interact_time = millis();
+  // Unhide LVGL elements
+  lv_obj_clear_flag(System.active_screen, LV_OBJ_FLAG_HIDDEN);
+  lv_refr_now(System.display);
 
   // Turn the backlight on
   analogWrite(EXAMPLE_PIN_NUM_BK_LIGHT, System.brightness);
 
-  // Re-Initialize the LCD
-  tft_init();
+  // Update the interaction time
+  System.last_interact_time = millis();
 
 }
 
@@ -379,5 +395,6 @@ void TRGB::deep_sleep() {
 }
 
 void shutdown() {
-  trgb.deep_sleep();
+  //trgb.deep_sleep();
+  trgb.sleep();
 }
