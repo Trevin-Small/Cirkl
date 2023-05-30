@@ -394,6 +394,7 @@ void TRGB::deep_sleep() {
 }
 
 void shutdown() {
+  // Deep sleep causes the device to crash on wakeup. Use regular sleep for now.
   //trgb.deep_sleep();
   trgb.sleep();
 }
